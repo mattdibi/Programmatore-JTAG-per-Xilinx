@@ -9,11 +9,11 @@
 #include "svftoserial.hpp"
 
 // Funzione di decodifica istruzione: prende come argomento la singola linea del file
-// (o più linee riassunte in un'unica stringa nel caso del bitstream); esclude automaticamente
+// (o piÃ¹ linee riassunte in un'unica stringa nel caso del bitstream); esclude automaticamente
 // commenti, istruzioni TIR, HIR, TDR, HDR e altre istruzioni che non devono generare uscite.
 // Viene passato anche bufdim per eventuali controlli di "sforamento" del buffer, non ancora
 // implementati ma implementabili come miglioria.
-// Come indicato nel file svf specifico "blink_led.svf" si è assunto che lo stato a cui si passa
+// Come indicato nel file svf specifico "blink_led.svf" si Ã¨ assunto che lo stato a cui si passa
 // al termine delle SIR e SDR sia quello di IDLE (vederee ENDIR e ENDDR).
 
 void DecodeInstruction (string& line, char*& buffer, long int& bufdim) 
