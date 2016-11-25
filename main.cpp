@@ -25,7 +25,7 @@ int main(int argc, char* argv[])
    char* instruction_buffer;
    long int ib_length;
    bool manual_mode=false;
-   string s;
+   string s, s_tmp;
    if(argc==2)
    {
       if(!strcmp(argv[1], "-m"))
@@ -70,10 +70,12 @@ int main(int argc, char* argv[])
             s+='\n'; //perché sennò la seriale si incazza
             serialPort.WriteString(s.c_str());
             sleep(1);
-            /*ret=serialPort.ReadString(buffer,'\n', BUFFER_MAX_SIZE, 5000);
+            
+            // Leggiamo cosa risponde la seriale
+            ret=serialPort.ReadString(buffer,'\n', BUFFER_MAX_SIZE, 5000);
             s_tmp=string(buffer);
             SanitizeInput(s_tmp);
-            cout<<s_tmp;*/
+            cout<<"Output seriale:"<<endl<<s_tmp<<endl;
          }
          cout<<"Update successful"<<endl;
       }
