@@ -1,3 +1,6 @@
+#ifndef SVFTOSERIAL_HPP
+#define SVFTOSERIAL_HPP
+
 #include <iostream>
 #include <fstream>
 #include <string>
@@ -12,3 +15,5 @@ void GenerateSTATEOutput(string& line, char*& buffer, long int& bufdim); // Gene
 void GenerateRUNTESTOutput(string& line, char*& buffer, long int& bufdim); // Genera output per le istruzioni RUNTEST
 string hexstrToBinstr(const string& hex);	// Funzione di conversione stringa esadecimale in stringa binaria
 const char* hexCharToBin(char c);	// Funzione di conversione valore esadecimale in valore binario
+
+#endif

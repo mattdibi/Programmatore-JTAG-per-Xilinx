@@ -1,7 +1,12 @@
+#ifndef SVFTOSERIAL_CPP
+#define SVFTOSERIAL_CPP
+
 #include <iostream>
 #include <fstream>
 #include <string>
 #include <sstream>
+
+#include "svftoserial.hpp"
 
 // Funzione di decodifica istruzione: prende come argomento la singola linea del file
 // (o più linee riassunte in un'unica stringa nel caso del bitstream); esclude automaticamente
@@ -11,7 +16,7 @@
 // Come indicato nel file svf specifico "blink_led.svf" si è assunto che lo stato a cui si passa
 // al termine delle SIR e SDR sia quello di IDLE (vederee ENDIR e ENDDR).
 
-void DecodeInstruction (string& line, char* buffer, long int& bufdim) 
+void DecodeInstruction (string& line, char*& buffer, long int& bufdim) 
 {
 	if (isalpha(line[0]) && isupper(line[0])) 	// Serve per non considerare commenti
     {
@@ -25,11 +30,15 @@ void DecodeInstruction (string& line, char* buffer, long int& bufdim)
 		else 
 		{
 		// Eventuale handler per altri casi
+		// costruisce stringa vuota
+		   bufdim = 1;
+		   buffer = new char[bufdim];
+		   buffer[0] = '\0';
 		}
 	}
 }
 
-void GenerateSDROutput (string& line, char* buffer, long int& bufdim) // Genera output per le istruzioni SDR
+void GenerateSDROutput (string& line, char*& buffer, long int& bufdim) // Genera output per le istruzioni SDR
 {
 		istringstream iss(line);
 		string sub;
@@ -46,7 +55,7 @@ void GenerateSDROutput (string& line, char* buffer, long int& bufdim) // Genera 
 		{														// e di apertura
 			buffer[sub.length()-2-k+3] = sub[k];				// Riempie buffer partendo da ultimo carattere
 		}
-		string binval = hexstrToBinstr(sub[k]);					// Converte ultimo valore esadecimale in stringa binaria
+		string binval = hexCharToBin(sub[k]);					// Converte ultimo valore esadecimale in stringa binaria
 		for (int i=binval.length()-1; i>0; i--)					// Sostituisce '.' e ',' a 0 e 1
 		{
 			if (binval[i]=='0') buffer[(sub.length()-2-k+3) + (binval.length()-1-i)] = '.';
@@ -59,11 +68,11 @@ void GenerateSDROutput (string& line, char* buffer, long int& bufdim) // Genera 
 		buffer[(sub.length()-2-k+3) + (binval.length()-1-i) + 3] = '\n';	// Delimitatore buffer
 }
 
-void GenerateSIROutput (string& line, char* buffer, long int& bufdim) // Genera output per le istruzioni SIR
+void GenerateSIROutput (string& line, char*& buffer, long int& bufdim) // Genera output per le istruzioni SIR
 {
 		istringstream iss(line);
 		string sub, str;
-		int n;
+		int n, k;
 		iss >> sub; 											// Scarta nome comando
 		iss >> n, k;											// Memorizza lunghezza istruzione
 		bufdim = n + 4 + 3;										// Considera istruzione e caratteri iniziali e finali
@@ -85,7 +94,7 @@ void GenerateSIROutput (string& line, char* buffer, long int& bufdim) // Genera 
 		buffer[str.length()] = '\n';							// Carattere di delimitazione
 }
 
-void GenerateSTATEOutput (string& line, char* buffer, long int& bufdim) // Genera output per le istruzioni STATE
+void GenerateSTATEOutput (string& line, char*& buffer, long int& bufdim) // Genera output per le istruzioni STATE
 {
 		istringstream iss(line);
 		string sub;
@@ -109,7 +118,7 @@ void GenerateSTATEOutput (string& line, char* buffer, long int& bufdim) // Gener
 		}
 }
 
-void GenerateRUNTESTOutput (string& line, char* buffer, long int& bufdim) // Genera output per le istruzioni RUNTEST
+void GenerateRUNTESTOutput (string& line, char*& buffer, long int& bufdim) // Genera output per le istruzioni RUNTEST
 {
 		istringstream iss(line);
 		string sub, str;
@@ -156,6 +165,8 @@ const char* hexCharToBin(char c)	// Funzione di conversione valore esadecimale i
         case 'F': return "1111";
     }
 }
+
+#endif
 
 // Modifiche:
 // 1. In tutte le funzioni l'argomento long int bufdim diventa long int& bufdim

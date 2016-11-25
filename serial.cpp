@@ -1,3 +1,6 @@
+#ifndef SERIAL_CPP
+#define SERIAL_CPP
+
 #include "serial.hpp"
 
 Serial::Serial()
@@ -227,4 +230,5 @@ unsigned long int TimeOut::ElapsedTime_ms()
    return sec*1000+usec/1000;
 }
 
+#endif
 

@@ -1,9 +1,13 @@
+#ifndef MAIN_CPP
+#define MAIN_CPP
+
 #include <fstream>
 #include <string>
+
 #include "serial.hpp"
 #include "svftoserial.hpp"
 
-#define DEVICE_PORT "/dev/ttyUSB0"
+#define DEVICE_PORT "/dev/ttyACM0"
 
 const unsigned BUFFER_SIZE=4096;
 const unsigned long BUFFER_MAX_SIZE=200000000;
@@ -123,3 +127,5 @@ bool isHexDigit(char ch)
 {
    return isdigit(ch) || (ch>='a' && ch<='f');
 }
+
+#endif
