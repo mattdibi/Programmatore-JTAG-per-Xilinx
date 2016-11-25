@@ -1,6 +1,3 @@
-#ifndef MAIN_CPP
-#define MAIN_CPP
-
 #include <fstream>
 #include <string>
 
@@ -127,5 +124,3 @@ bool isHexDigit(char ch)
 {
    return isdigit(ch) || (ch>='a' && ch<='f');
 }
-
-#endif
