@@ -18,7 +18,8 @@ using namespace std;
 int main(int argc, char* argv[])
 {
    Serial serialPort;
-   ifstream svf_file("blink_led.svf", fstream::in);
+   //ifstream svf_file("blink_led.svf", fstream::in);
+   ifstream svf_file("id_code.svf", fstream::in);
    unsigned ret;
    
    char buffer[BUFFER_SIZE];
