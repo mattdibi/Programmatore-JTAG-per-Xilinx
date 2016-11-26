@@ -38,33 +38,40 @@ string DecodeInstruction (string line)
 string GenerateSDROutput (string line) // Genera output per le istruzioni SDR
 {
 		istringstream iss(line);
-		string sub;
+		string sub, str;
 		long int n, k;											// n assunto divisibile per 4, altrimenti ulteriori controlli da implementare
 		int i;
+
 		iss >> sub; 											// Scarta nome comando
 		iss >> n;												// Memorizza dimensione dati, utilizzabile per verifica
-		int bufdim = n + 3 + 3 + 3;									// Condidera dati, ultimo carattere e caratteri iniziali e finali
-		char buffer[bufdim];
 		iss >> sub; 											// Scarta parametro
 		iss >> sub;												// Prende dati in esadecimale tra parentesi
-		buffer[0] = '!'; buffer[1] = '*'; buffer[2] = '*';		// Parte iniziale SDR. 1 o 2 asterischi? se 1 diminuire di 1 conteggi buffer succ.
+		
+		str += "!**";
+		
 		for (k = sub.length()-2; k>1; k--)						// Conteggio da ultimo carattere escludendo parentesi di chiusura
 		{														// e di apertura
-			buffer[sub.length()-2-k+3] = sub[k];				// Riempie buffer partendo da ultimo carattere
+			str += sub[k];
 		}
+
 		string binval = hexCharToBin(sub[k]);					// Converte ultimo valore esadecimale in stringa binaria
+
 		for (int i=binval.length()-1; i>0; i--)					// Sostituisce '.' e ',' a 0 e 1
 		{
-			if (binval[i]=='0') buffer[(sub.length()-2-k+3) + (binval.length()-1-i)] = '.';
-			else if(binval[i]=='1') buffer[(sub.length()-2-k+3) + (binval.length()-1-i)] = ',';
+			if (binval[i]=='0') 
+				str += ".";
+			else if(binval[i]=='1') 
+				str += ",";
 		}
-		if (binval[i]=='0') buffer[(sub.length()-2-k+3) + (binval.length()-1-i)] = ':';		// Sostituisce l'ultimo 0 o 1 con ':' 
-        else if (binval[i]=='1') buffer[(sub.length()-2-k+3) + (binval.length()-1-i)]= ';';	// o ';'
-		buffer[(sub.length()-2-k+3) + (binval.length()-1-i) + 1] = '!';		// Parte finale comune a tutti gli SDR
-		buffer[(sub.length()-2-k+3) + (binval.length()-1-i) + 2] = '*';
-		buffer[(sub.length()-2-k+3) + (binval.length()-1-i) + 3] = '\n';	// Delimitatore buffer
 
-		return string(buffer);
+		if (binval[i]=='0') 
+			str += ":";
+        else if (binval[i]=='1') 
+			str += ";";
+
+		str += "!*\n";
+
+		return str;
 }
 
 string GenerateSIROutput (string line) // Genera output per le istruzioni SIR
@@ -72,27 +79,34 @@ string GenerateSIROutput (string line) // Genera output per le istruzioni SIR
 		istringstream iss(line);
 		string sub, str;
 		int n, k;
+
 		iss >> sub; 											// Scarta nome comando
 		iss >> n;												// Memorizza lunghezza istruzione
-		int bufdim = n + 4 + 3;									// Considera istruzione e caratteri iniziali e finali
-		char buffer[bufdim];
 		iss >> sub; 											// Scarta parametro
 		iss >> sub;												// Prende istruzione in esadecimale tra parentesi
+
 		string hexval = sub.substr(1,2);						// Preleva parte tra parentesi
 		string binval = hexstrToBinstr(hexval);					// Converte stringa esadecimale in stringa binaria
+
 		str += "!!**";											// Inserisce parte iniziale comune per tutte le SIR
+		
 		for (k=binval.length()-1; k>binval.length()-n; k--)		// Sostituisce '.' e ',' a 0 e 1
 		{
-			if (binval[k]=='0') str += '.';
-			else if(binval[k]=='1') str += ',';
+			if (binval[k]=='0') 
+				str += '.';
+			else if(binval[k]=='1') 
+				str += ',';
 		}
-		if (binval[k]=='0') str += ':';							// Sostituisce l'ultimo 0 o 1 con ':' 
-        else if (binval[k]=='1') str += ';';					// o ';'
-		str += "!*";											// Inserisce parte finale comune per tutte le SIR
-		str.copy(buffer,str.length(),0);
-		buffer[str.length()] = '\n';							// Carattere di delimitazione
 
-		return string(buffer);
+		// Sostituisce l'ultimo 0 o 1 con ':' o con ';'
+		if (binval[k]=='0') 
+			str += ':';
+        else if (binval[k]=='1') 
+			str += ';';
+
+		str += "!*\n";											// Inserisce parte finale comune per tutte le SIR
+		
+		return str;
 }
 
 string GenerateSTATEOutput (string line) // Genera output per le istruzioni STATE
@@ -116,25 +130,29 @@ string GenerateRUNTESTOutput (string line) // Genera output per le istruzioni RU
 		istringstream iss(line);
 		string sub, str;
 		int n, i;
+
 		iss >> sub; 					// Scarta nome comando
 		iss >> n;
-		int bufdim = n/4 + 1;
-		char buffer[bufdim];
+
 		for (i=0; i < n/4; i++)			// Assumendo che i cicli di clock indicati siano divisibili per 4
 		{
 			str += '0';					// Tanti '0' quanti sono i cicli di clock richiesti divisi per 4
 		}
-		str.copy(buffer,str.length(),0);
-		buffer[str.length()] = '\n';	// Carattere di delimitazione
+		
+		str +="\n";
 
-		return string(buffer);
+		return str;
 }
 
-string hexstrToBinstr(const string& hex)	// Funzione di conversione stringa esadecimale in stringa binaria
+string hexstrToBinstr(string hex)	// Funzione di conversione stringa esadecimale in stringa binaria
 {
 		string bin;
+
 		for(unsigned k = 0; k != hex.length(); ++k)
+		{
 			bin += hexCharToBin(hex[k]);
+		}
+
 		return bin;
 }
 
