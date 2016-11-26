@@ -74,7 +74,7 @@ void GenerateSIROutput (string& line, char*& buffer, long int& bufdim) // Genera
 		string sub, str;
 		int n, k;
 		iss >> sub; 											// Scarta nome comando
-		iss >> n, k;											// Memorizza lunghezza istruzione
+		iss >> n;												// Memorizza lunghezza istruzione
 		bufdim = n + 4 + 3;										// Considera istruzione e caratteri iniziali e finali
 		buffer = new char [bufdim];
 		iss >> sub; 											// Scarta parametro
@@ -82,7 +82,7 @@ void GenerateSIROutput (string& line, char*& buffer, long int& bufdim) // Genera
 		string hexval = sub.substr(1,2);						// Preleva parte tra parentesi
 		string binval = hexstrToBinstr(hexval);					// Converte stringa esadecimale in stringa binaria
 		str += "!!**";											// Inserisce parte iniziale comune per tutte le SIR
-		for (k=binval.length()-1; k>binval.length()-n; k--)	// Sostituisce '.' e ',' a 0 e 1
+		for (k=binval.length()-1; k>binval.length()-n; k--)		// Sostituisce '.' e ',' a 0 e 1
 		{
 			if (binval[k]=='0') str += '.';
 			else if(binval[k]=='1') str += ',';
