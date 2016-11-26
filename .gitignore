@@ -30,3 +30,7 @@
 *.exe
 *.out
 *.app
+
+# Extra
+*.txt
+interface
