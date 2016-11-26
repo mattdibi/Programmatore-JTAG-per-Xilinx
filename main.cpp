@@ -26,7 +26,7 @@ int main(int argc, char* argv[])
    char* instruction_buffer;
    long int ib_length;
    bool manual_mode=false;
-   string s, s_tmp;
+   string instruction, decodedInstruction, s, s_tmp;
    if(argc==2)
    {
       if(!strcmp(argv[1], "-m"))
@@ -63,13 +63,15 @@ int main(int argc, char* argv[])
          while(svf_file.good())
          {
             cout<<"Entrato nel while"<<endl;
-            s=ExtractInstruction(svf_file);
-            cout<<"Stringa da file: "<<s<<endl;
-            DecodeInstruction(s, instruction_buffer, ib_length);
-            s=string(instruction_buffer);
-            cout<<"<decodedstring> "<<s<<" </decodedstring>"<<endl;
-            s+='\n'; //perché sennò la seriale si incazza
-            serialPort.WriteString(s.c_str());
+
+            instruction = ExtractInstruction(svf_file);
+            cout << "Stringa da file: " << instruction << endl;
+
+            decodedInstruction = DecodeInstruction(instruction);
+            cout << "<decodedstring> " << decodedInstruction << " </decodedstring>" << endl;
+            decodedInstruction += '\n'; //perché sennò la seriale si incazza
+
+            serialPort.WriteString(decodedInstruction.c_str());
             sleep(1);
             
             // Leggiamo cosa risponde la seriale
