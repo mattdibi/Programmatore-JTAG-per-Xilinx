@@ -54,7 +54,7 @@ int main(int argc, char* argv[])
             serialPort.ReadString(buffer, '\n', BUFFER_SIZE, 5000);
             s=string(buffer);
             SanitizeInput(s);
-   cout<<"---------------------------------------------------------"<<endl<<s<<"---------------------------------------------------------"<<endl;
+            cout<<"---------------------------------------------------------"<<endl<<s<<"---------------------------------------------------------"<<endl;
             cin>>s;
          }
       }
@@ -67,7 +67,7 @@ int main(int argc, char* argv[])
             cout<<"Stringa da file: "<<s<<endl;
             DecodeInstruction(s, instruction_buffer, ib_length);
             s=string(instruction_buffer);
-            cout<<"Stringa decodificata: "<<s<<endl;
+            cout<<"<decodedstring> "<<s<<" </decodedstring>"<<endl;
             s+='\n'; //perché sennò la seriale si incazza
             serialPort.WriteString(s.c_str());
             sleep(1);
@@ -76,7 +76,7 @@ int main(int argc, char* argv[])
             ret=serialPort.ReadString(buffer,'\n', BUFFER_MAX_SIZE, 5000);
             s_tmp=string(buffer);
             SanitizeInput(s_tmp);
-            cout<<"Output seriale:"<<endl<<s_tmp<<endl;
+            cout<<"<serialout>"<<endl<<s_tmp<<endl<<"</serialout>"<<endl;
          }
          cout<<"Update successful"<<endl;
       }
