@@ -63,13 +63,13 @@ int main(int argc, char* argv[])
       {
          while(svf_file.good())
          {
-            cout<<"Entrato nel while"<<endl;
+            cout << "Entrato nel while" << endl;
 
             instruction = ExtractInstruction(svf_file);
             cout << "Stringa da file: " << instruction << endl;
 
             decodedInstruction = DecodeInstruction(instruction);
-            cout << "<decodedstring> " << decodedInstruction << " </decodedstring>" << endl;
+            cout << "Decoded instruction: " << decodedInstruction << endl;
             decodedInstruction += '\n'; //perché sennò la seriale si incazza
 
             serialPort.WriteString(decodedInstruction.c_str());
@@ -89,11 +89,11 @@ int main(int argc, char* argv[])
                   } while (decodedInstruction.compare(inputArduino) != 1); // Continua finchè le stringhe non sono uguali
 
                   // Printa la risposta dell'Arduino
-                  cout << "<serialout> " << endl << s_tmp << endl << " </serialout>" << endl;
+                  cout << "Output seriale: " << endl << s_tmp << endl;
             }
 
          }
-         cout<<"Update successful"<<endl;
+         cout << "Update successful" << endl;
       }
    }
    catch(TimeoutException& e)

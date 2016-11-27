@@ -30,7 +30,7 @@ string DecodeInstruction (string line)
 		else 
 		{
 			// Handler per altri casi
-		   return "";
+			return "";
 		}
 	}
 }
