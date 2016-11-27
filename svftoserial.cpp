@@ -29,7 +29,7 @@ string DecodeInstruction (string line)
 		else if (sub == "RUNTEST")	return GenerateSTATEOutput (line);
 		else 
 		{
-		// Eventuale handler per altri casi
+			// Handler per altri casi
 		   return "";
 		}
 	}
@@ -69,7 +69,7 @@ string GenerateSDROutput (string line) // Genera output per le istruzioni SDR
         else if (binval[i]=='1') 
 			str += ";";
 
-		str += "!*\n";
+		str += "!*";
 
 		return str;
 }
@@ -104,7 +104,7 @@ string GenerateSIROutput (string line) // Genera output per le istruzioni SIR
         else if (binval[k]=='1') 
 			str += ';';
 
-		str += "!*\n";											// Inserisce parte finale comune per tutte le SIR
+		str += "!*";											// Inserisce parte finale comune per tutte le SIR
 		
 		return str;
 }
@@ -121,7 +121,7 @@ string GenerateSTATEOutput (string line) // Genera output per le istruzioni STAT
 		}
 		else if (sub == "IDLE;") 
 		{
-			return "*\n";
+			return "*";
 		}
 }
 
@@ -138,8 +138,6 @@ string GenerateRUNTESTOutput (string line) // Genera output per le istruzioni RU
 		{
 			str += '0';					// Tanti '0' quanti sono i cicli di clock richiesti divisi per 4
 		}
-		
-		str +="\n";
 
 		return str;
 }

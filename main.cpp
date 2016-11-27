@@ -11,6 +11,7 @@ const unsigned long BUFFER_MAX_SIZE=200000000;
 
 bool isHexDigit(char ch);
 string ExtractInstruction(ifstream& is);
+string ExtractAnswer(string line);
 void SanitizeInput(string& s);
 
 using namespace std;
@@ -18,15 +19,15 @@ using namespace std;
 int main(int argc, char* argv[])
 {
    Serial serialPort;
-   //ifstream svf_file("blink_led.svf", fstream::in);
-   ifstream svf_file("id_code.svf", fstream::in);
+   ifstream svf_file("blink_led.svf", fstream::in);
+   //ifstream svf_file("id_code.svf", fstream::in);
    unsigned ret;
    
    char buffer[BUFFER_SIZE];
    char* instruction_buffer;
    long int ib_length;
    bool manual_mode=false;
-   string instruction, decodedInstruction, s, s_tmp;
+   string instruction, decodedInstruction, inputArduino, s, s_tmp;
    if(argc==2)
    {
       if(!strcmp(argv[1], "-m"))
@@ -74,11 +75,23 @@ int main(int argc, char* argv[])
             serialPort.WriteString(decodedInstruction.c_str());
             sleep(1);
             
-            // Leggiamo cosa risponde la seriale
-            ret=serialPort.ReadString(buffer,'\n', BUFFER_MAX_SIZE, 5000);
-            s_tmp=string(buffer);
-            SanitizeInput(s_tmp);
-            cout<<"<serialout>"<<endl<<s_tmp<<endl<<"</serialout>"<<endl;
+            // Leggiamo cosa risponde la seriale se la decodedInstruction è diversa da stringa vuota
+            if (decodedInstruction != "\n")
+            {
+                  // Ciclo di attesa per dare il tempo all'Arduino di rispondere
+                  do {
+                        ret = serialPort.ReadString(buffer,'\n', BUFFER_MAX_SIZE, 5000);
+                        s_tmp = string(buffer);
+                        SanitizeInput(s_tmp);
+
+                        // Ricaviamo la risposta dell'arduino
+                        inputArduino = ExtractAnswer(s_tmp);
+                  } while (decodedInstruction.compare(inputArduino) != 1); // Continua finchè le stringhe non sono uguali
+
+                  // Printa la risposta dell'Arduino
+                  cout << "<serialout> " << endl << s_tmp << endl << " </serialout>" << endl;
+            }
+
          }
          cout<<"Update successful"<<endl;
       }
@@ -123,6 +136,17 @@ string ExtractInstruction(ifstream& is)
       }
    }
    return "";
+}
+
+string ExtractAnswer(string line)
+{
+      istringstream iss(line);
+      string str;
+      iss >> str;
+      iss >> str;
+      iss >> str;
+
+      return str;
 }
 
 bool isHexDigit(char ch)
