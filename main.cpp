@@ -19,8 +19,8 @@ using namespace std;
 int main(int argc, char* argv[])
 {
    Serial serialPort;
-   //ifstream svf_file("blink_led.svf", fstream::in);
-   ifstream svf_file("id_code.svf", fstream::in);
+   ifstream svf_file("blink_led.svf", fstream::in);
+   //ifstream svf_file("id_code.svf", fstream::in);
    unsigned ret;
    
    char buffer[BUFFER_SIZE];
@@ -68,29 +68,38 @@ int main(int argc, char* argv[])
             instruction = ExtractInstruction(svf_file);
             cout << "Stringa da file: " << instruction << endl;
 
-            decodedInstruction = DecodeInstruction(instruction);
-            if (decodedInstruction != "")
-                  cout << "Decoded instruction: " << decodedInstruction << endl;
-            decodedInstruction += '\n'; //perché sennò la seriale si incazza
-
-            serialPort.WriteString(decodedInstruction.c_str());
-            sleep(1);
-            
-            // Leggiamo cosa risponde la seriale se la decodedInstruction è diversa da stringa vuota
-            if (decodedInstruction != "\n")
+            // Rileviamo se stiamo prendendo il bitstream
+            if( instruction.size() > 1024 )
             {
-                  // Ciclo di attesa per dare il tempo all'Arduino di rispondere
-                  do {
-                        ret = serialPort.ReadString(buffer,'\n', BUFFER_MAX_SIZE, 5000);
-                        s_tmp = string(buffer);
-                        SanitizeInput(s_tmp);
+                  // have fun
+                  cout << "LOL\n";
+            }
+            else
+            {
+                  decodedInstruction = DecodeInstruction(instruction);
+                  if (decodedInstruction != "")
+                        cout << "Decoded instruction: " << decodedInstruction << endl;
+                  decodedInstruction += '\n'; //perché sennò la seriale si incazza
 
-                        // Ricaviamo la risposta dell'arduino
-                        inputArduino = ExtractAnswer(s_tmp);
-                  } while (decodedInstruction.compare(inputArduino) != 1); // Continua finchè le stringhe non sono uguali
+                  serialPort.WriteString(decodedInstruction.c_str());
+                  sleep(1);
+                  
+                  // Leggiamo cosa risponde la seriale se la decodedInstruction è diversa da stringa vuota
+                  if (decodedInstruction != "\n")
+                  {
+                        // Ciclo di attesa per dare il tempo all'Arduino di rispondere
+                        do {
+                              ret = serialPort.ReadString(buffer,'\n', BUFFER_MAX_SIZE, 5000);
+                              s_tmp = string(buffer);
+                              SanitizeInput(s_tmp);
 
-                  // Printa la risposta dell'Arduino
-                  cout << "Output seriale: " << endl << s_tmp << endl;
+                              // Ricaviamo la risposta dell'arduino
+                              inputArduino = ExtractAnswer(s_tmp);
+                        } while (decodedInstruction.compare(inputArduino) != 1); // Continua finchè le stringhe non sono uguali
+
+                        // Printa la risposta dell'Arduino
+                        cout << "Output seriale: " << endl << s_tmp << endl;
+                  }
             }
 
          }
