@@ -19,8 +19,8 @@ using namespace std;
 int main(int argc, char* argv[])
 {
    Serial serialPort;
-   ifstream svf_file("blink_led.svf", fstream::in);
-   //ifstream svf_file("id_code.svf", fstream::in);
+   //ifstream svf_file("blink_led.svf", fstream::in);
+   ifstream svf_file("id_code.svf", fstream::in);
    unsigned ret;
    
    char buffer[BUFFER_SIZE];
@@ -61,15 +61,16 @@ int main(int argc, char* argv[])
       }
       else
       {
+         cout << "Entrato nel while" << endl;
+         
          while(svf_file.good())
          {
-            cout << "Entrato nel while" << endl;
-
             instruction = ExtractInstruction(svf_file);
             cout << "Stringa da file: " << instruction << endl;
 
             decodedInstruction = DecodeInstruction(instruction);
-            cout << "Decoded instruction: " << decodedInstruction << endl;
+            if (decodedInstruction != "")
+                  cout << "Decoded instruction: " << decodedInstruction << endl;
             decodedInstruction += '\n'; //perché sennò la seriale si incazza
 
             serialPort.WriteString(decodedInstruction.c_str());
