@@ -20,7 +20,7 @@
 //#define DEBUG
 
 // Buffer Size
-#define BUFSIZE 128
+#define BUFSIZE 1024
 
 // Pinout
 #define LED 13
