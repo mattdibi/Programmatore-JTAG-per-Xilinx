@@ -1,5 +1,6 @@
 #include <fstream>
 #include <string>
+#include <vector>
 
 #include "serial.hpp"
 #include "svftoserial.hpp"
@@ -10,7 +11,7 @@ const unsigned BUFFER_SIZE=4096;
 const unsigned long BUFFER_MAX_SIZE=200000000;
 
 bool isHexDigit(char ch);
-string ExtractInstruction(ifstream& is);
+vector<string> ExtractInstruction(ifstream& is);
 string ExtractAnswer(string line);
 void SanitizeInput(string& s);
 
@@ -19,15 +20,18 @@ using namespace std;
 int main(int argc, char* argv[])
 {
    Serial serialPort;
-   //ifstream svf_file("blink_led.svf", fstream::in);
-   ifstream svf_file("myidcode.svf", fstream::in);
+   ifstream svf_file("blink_led.svf", fstream::in);
+   //ifstream svf_file("myidcode.svf", fstream::in);
    unsigned ret;
    
    char buffer[BUFFER_SIZE];
    char* instruction_buffer;
    long int ib_length;
    bool manual_mode=false;
+
    string instruction, decodedInstruction, inputArduino, s, s_tmp;
+   vector<string> instructionsFile;
+
    if(argc==2)
    {
       if(!strcmp(argv[1], "-m"))
@@ -62,21 +66,27 @@ int main(int argc, char* argv[])
       else
       {
          cout << "Entrato nel while" << endl;
+
+         instructionsFile = ExtractInstruction(svf_file);
+
+         cout << "InstructionFile size: " << instructionsFile.size() << "\n";
          
-         while(svf_file.good())
+         for(int i=0;i<instructionsFile.size();i++)
          {
-            instruction = ExtractInstruction(svf_file);
-            cout << "Stringa da file: " << instruction << endl;
+            cout << "Stringa da file: " << instructionsFile[i] << endl;
 
             // Rileviamo se stiamo prendendo il bitstream
             if( instruction.size() > 1024 )
             {
-                  // have fun
-                  cout << "LOL\n";
+                  // Estraiamo vettore di stringhe
+
+                  // Specchiamo tutte le stringhe
+
+                  // Ciclo di stampa sulla seriale dall'ultima stringa ricevuta fino alla prima
             }
             else
             {
-                  decodedInstruction = DecodeInstruction(instruction);
+                  decodedInstruction = DecodeInstruction(instructionsFile[i]);
                   if (decodedInstruction != "")
                         cout << "Decoded instruction: " << decodedInstruction << endl;
                   decodedInstruction += '\n'; //perché sennò la seriale si incazza
@@ -129,23 +139,43 @@ void SanitizeInput(string& s)
          s[i]='\n';
 }
 
-string ExtractInstruction(ifstream& is)
+vector<string> ExtractInstruction(ifstream& is)
 {
-   string s, s_tmp;
-   while(is.good())
+   vector<string> instruction;
+   string s="", s_tmp;
+   char ch;
+   int n=0;
+   instruction.clear();
+   while(is.good()&&!is.eof())
    {
-      getline(is, s);
-      if(s[0]!= '/' && s[1]!='/' && s!="")
+      n=0;
+      s="";
+      ch=is.get();
+      if(ch==EOF) continue;
+      while(ch=='/')
       {
-         while(isHexDigit(is.peek()))
-         {
-            getline(is, s_tmp);
-            s+=s_tmp;
-         }
-         return s;
+         while(is.get()!='\n'); //consumo il commento
+         ch=is.get();
+      }
+
+      while(ch!='\n' && n<100)
+      {
+         s+=ch;
+         ch=is.get();
+         n++;
+      }
+      if(ch=='\n')
+      {
+         instruction.push_back(s);
+      }
+      else
+      {
+         s+='\n';
+         instruction.push_back(s);
       }
    }
-   return "";
+   instruction.push_back("");
+   return instruction;
 }
 
 string ExtractAnswer(string line)
