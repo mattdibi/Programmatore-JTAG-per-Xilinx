@@ -68,8 +68,6 @@ int main(int argc, char* argv[])
          cout << "Entrato nel while" << endl;
 
          instructionsFile = ExtractInstruction(svf_file);
-
-         cout << "InstructionFile size: " << instructionsFile.size() << "\n";
          
          for(int i=0;i<instructionsFile.size();i++)
          {
@@ -142,36 +140,39 @@ void SanitizeInput(string& s)
 vector<string> ExtractInstruction(ifstream& is)
 {
    vector<string> instruction;
-   string s="", s_tmp;
    char ch;
    int n=0;
-   instruction.clear();
+
    while(is.good()&&!is.eof())
    {
       n=0;
-      s="";
-      ch=is.get();
-      if(ch==EOF) continue;
-      while(ch=='/')
-      {
-         while(is.get()!='\n'); //consumo il commento
-         ch=is.get();
-      }
+      string s="";
 
-      while(ch!='\n' && n<100)
+      ch=is.get();
+
+      if(ch==EOF)
+            continue;
+      else if(ch=='/')
       {
-         s+=ch;
-         ch=is.get();
-         n++;
-      }
-      if(ch=='\n')
-      {
-         instruction.push_back(s);
+            is.ignore(100, '\n');
+            continue;
       }
       else
       {
-         s+='\n';
-         instruction.push_back(s);
+            do
+            {
+                  n++;
+                  s+=ch;
+                  ch=is.get();
+            }while(ch!='\n' && n<100);
+
+            if(n >= 100)
+            {
+                  s+=ch;
+                  s+='\n';
+            }
+            
+            instruction.push_back(s);
       }
    }
    instruction.push_back("");
