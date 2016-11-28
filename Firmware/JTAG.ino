@@ -20,14 +20,14 @@
 //#define DEBUG
 
 // Buffer Size
-#define BUFSIZE 128
+#define BUFSIZE 512
 
 // Pinout
 #define LED 13
 
 #define TMS 8
 #define TDI 9
-#define TDO 36 //Pin 10 broken
+#define TDO 10 //Pin 10 broken
 #define TCK 11
 
 // Optional hardware flow control

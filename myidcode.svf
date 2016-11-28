@@ -1,0 +1,7 @@
+// Created using Xilinx Cse Software [ISE - 14.7]
+// Date: Thu May 28 18:09:52 2015
+STATE RESET;
+STATE IDLE;
+//Loading device with 'idcode' instruction.
+SIR 6 TDI (09) SMASK (3f) ;
+SDR 32 TDI (00000000) SMASK (ffffffff) TDO (f4008093) MASK (0fffffff) ;
