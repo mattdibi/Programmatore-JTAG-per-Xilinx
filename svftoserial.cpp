@@ -47,7 +47,7 @@ string GenerateSDROutput (string line) // Genera output per le istruzioni SDR
 		iss >> sub; 											// Scarta parametro
 		iss >> sub;												// Prende dati in esadecimale tra parentesi
 		
-		str += "!**";
+		str += "!*";
 		
 		for (k = sub.length()-2; k>1; k--)						// Conteggio da ultimo carattere escludendo parentesi di chiusura
 		{														// e di apertura
