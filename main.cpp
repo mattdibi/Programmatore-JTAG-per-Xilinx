@@ -6,6 +6,7 @@
 #include "svftoserial.hpp"
 
 #define DEVICE_PORT "/dev/ttyUSB0"
+#define INSTR_LENGTH 300
 
 const unsigned BUFFER_SIZE=4096;
 const unsigned long BUFFER_MAX_SIZE=200000000;
@@ -202,9 +203,9 @@ vector<string> ExtractInstruction(ifstream& is)
                   n++;
                   s+=ch;
                   ch=is.get();
-            }while(ch!='\n' && n<100);
+            }while(ch != '\n' && n < INSTR_LENGTH);
 
-            if(n >= 100)
+            if(n >= INSTR_LENGTH)
             {
                   s+=ch;
                   s+='\n';
@@ -231,7 +232,7 @@ vector<string> ExtractBitstream(vector<string> instructionsFile, long int curren
 
       i++;
 
-      while(instructionsFile[currentIndex][i] != '\n')
+      while(instructionsFile[currentIndex][i] != '\n' && instructionsFile[currentIndex][i] != '\r')
       {
             tmp += instructionsFile[currentIndex][i];
             i++;
