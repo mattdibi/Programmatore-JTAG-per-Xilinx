@@ -23,9 +23,9 @@ using namespace std;
 int main(int argc, char* argv[])
 {
    Serial serialPort;
-   ifstream svf_file("blink_led.svf", fstream::in);
+   //ifstream svf_file("blink_led.svf", fstream::in);
    //ifstream svf_file("myidcode.svf", fstream::in);
-   //ifstream svf_file("bitstreamtest.svf", fstream::in);
+   ifstream svf_file("bitstreamtest.svf", fstream::in);
    unsigned ret;
    
    char buffer[BUFFER_SIZE];
@@ -103,7 +103,7 @@ int main(int argc, char* argv[])
                         if (decodedBitstream[j] != "\n")
                         {
                               do {
-                                    ret = serialPort.ReadString(buffer,'\n', BUFFER_MAX_SIZE, 0);
+                                    ret = serialPort.ReadString(buffer,'\n', BUFFER_MAX_SIZE, 5000);
                                     s_tmp = string(buffer);
                                     SanitizeInput(s_tmp);
 
