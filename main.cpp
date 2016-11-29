@@ -89,7 +89,7 @@ int main(int argc, char* argv[])
                   // ...
 
                   // Aggiorniamo i in modo che salti tutto il bitstream
-                  i += bitstream.size();
+                  i += (bitstream.size() - 1);
             }
             else
             {
