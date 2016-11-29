@@ -26,7 +26,7 @@ string DecodeInstruction (string line)
 		if (sub == "SDR")			return GenerateSDROutput (line);
 		else if (sub == "SIR") 		return GenerateSIROutput (line);
 		else if (sub == "STATE")	return GenerateSTATEOutput (line);
-		else if (sub == "RUNTEST")	return GenerateSTATEOutput (line);
+		else if (sub == "RUNTEST")	return GenerateRUNTESTOutput (line);
 		else 
 		{
 			// Handler per altri casi
@@ -56,7 +56,7 @@ string GenerateSDROutput (string line) // Genera output per le istruzioni SDR
 
 		string binval = hexCharToBin(sub[k]);					// Converte ultimo valore esadecimale in stringa binaria
 
-		for (int i=binval.length()-1; i>0; i--)					// Sostituisce '.' e ',' a 0 e 1
+		for (i=binval.length()-1; i>0; i--)					// Sostituisce '.' e ',' a 0 e 1
 		{
 			if (binval[i]=='0') 
 				str += ".";
@@ -127,19 +127,22 @@ string GenerateSTATEOutput (string line) // Genera output per le istruzioni STAT
 
 string GenerateRUNTESTOutput (string line) // Genera output per le istruzioni RUNTEST
 {
-		istringstream iss(line);
-		string sub, str;
-		int n, i;
+		// istringstream iss(line);
+		// string sub, str;
+		// int n, i;
 
-		iss >> sub; 					// Scarta nome comando
-		iss >> n;
+		// iss >> sub; 					// Scarta nome comando
+		// iss >> n;
 
-		for (i=0; i < n/4; i++)			// Assumendo che i cicli di clock indicati siano divisibili per 4
-		{
-			str += '0';					// Tanti '0' quanti sono i cicli di clock richiesti divisi per 4
-		}
+		// for (i=0; i < n/4; i++)			// Assumendo che i cicli di clock indicati siano divisibili per 4
+		// {
+		// 	str += '0';					// Tanti '0' quanti sono i cicli di clock richiesti divisi per 4
+		// }
 
-		return str;
+		// return str;
+
+		return "";
+		// La seriale va in timeout... pensare workaround
 }
 
 string hexstrToBinstr(string hex)	// Funzione di conversione stringa esadecimale in stringa binaria
