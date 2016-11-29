@@ -11,7 +11,9 @@ const unsigned BUFFER_SIZE=4096;
 const unsigned long BUFFER_MAX_SIZE=200000000;
 
 bool isHexDigit(char ch);
+bool isBitStreamInstruction(string instr);
 vector<string> ExtractInstruction(ifstream& is);
+vector<string> ExtractBitstream(vector<string> instructionsFile, long int currentIndex);
 string ExtractAnswer(string line);
 void SanitizeInput(string& s);
 
@@ -20,8 +22,9 @@ using namespace std;
 int main(int argc, char* argv[])
 {
    Serial serialPort;
-   ifstream svf_file("blink_led.svf", fstream::in);
+   //ifstream svf_file("blink_led.svf", fstream::in);
    //ifstream svf_file("myidcode.svf", fstream::in);
+   ifstream svf_file("bitstreamtest.svf", fstream::in);
    unsigned ret;
    
    char buffer[BUFFER_SIZE];
@@ -30,7 +33,7 @@ int main(int argc, char* argv[])
    bool manual_mode=false;
 
    string instruction, decodedInstruction, inputArduino, s, s_tmp;
-   vector<string> instructionsFile;
+   vector<string> instructionsFile, bitstream;
 
    if(argc==2)
    {
@@ -65,22 +68,28 @@ int main(int argc, char* argv[])
       }
       else
       {
-         cout << "Entrato nel while" << endl;
+         cout << "Entrato nel ciclo for" << endl;
 
          instructionsFile = ExtractInstruction(svf_file);
          
-         for(int i=0;i<instructionsFile.size();i++)
+         for(long int i = 0; i < instructionsFile.size(); i++)
          {
             cout << "Stringa da file: " << instructionsFile[i] << endl;
 
             // Rileviamo se stiamo prendendo il bitstream
-            if( instruction.size() > 1024 )
+            if( isBitStreamInstruction(instructionsFile[i]) )
             {
                   // Estraiamo vettore di stringhe
+                  bitstream = ExtractBitstream(instructionsFile,i);
 
                   // Specchiamo tutte le stringhe
+                  // ...
 
                   // Ciclo di stampa sulla seriale dall'ultima stringa ricevuta fino alla prima
+                  // ...
+
+                  // Aggiorniamo i in modo che salti tutto il bitstream
+                  i += bitstream.size();
             }
             else
             {
@@ -179,6 +188,41 @@ vector<string> ExtractInstruction(ifstream& is)
    return instruction;
 }
 
+vector<string> ExtractBitstream(vector<string> instructionsFile, long int currentIndex)
+{
+      vector<string> stream;
+      string tmp;
+      int i = 0;
+
+      // Prima riga: ignoro tutto ciò che viene prima delle parentesi
+      while(instructionsFile[currentIndex][i] != '(')
+      {
+            i++;
+      }
+
+      i++;
+
+      while(instructionsFile[currentIndex][i] != '\n')
+      {
+            tmp += instructionsFile[currentIndex][i];
+            i++;
+      }
+
+      stream.push_back(tmp);
+
+      currentIndex++;
+
+      // Immetto righe finchè l'ultimo carattere di una riga è ')'
+      // NB: Non è metodo molto robusto per cercare il carattere finale
+      while(instructionsFile[currentIndex][instructionsFile[currentIndex].size() - 4] != ')')
+      {
+            stream.push_back(instructionsFile[currentIndex]);
+            currentIndex++;
+      }
+
+      return stream;
+}
+
 string ExtractAnswer(string line)
 {
       istringstream iss(line);
@@ -193,4 +237,25 @@ string ExtractAnswer(string line)
 bool isHexDigit(char ch)
 {
    return isdigit(ch) || (ch>='a' && ch<='f');
+}
+
+bool isBitStreamInstruction(string instr)
+{
+      string s = instr.substr(0, 100);
+
+      istringstream iss(s);
+      string tmp;
+      long int n;
+
+      iss >> tmp;
+
+      if(tmp != "SDR")
+            return false;
+
+      iss >> n;
+
+      if(n < 1000)
+            return false;
+      
+      return true;
 }
