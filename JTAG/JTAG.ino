@@ -14,7 +14,7 @@
 #define ACTIVE HIGH     // Level of logic 1 on the JTAG lines
 #define QUIET 1        // Set to 1 to remove startup banner
 #define XONXOFF 0       // Send software flow control characters?
-#define TCKWAIT 1       // ms delay between clock edges
+#define TCKWAIT 25      // us delay between clock edges
 #define VERBOSITY 2 	    // Set to increase verbosity [0 = min, 2 = max]
 #define BAUDRATE 115200
 
@@ -369,9 +369,9 @@ uint8_t tdin(int n, uint8_t bits)
 void tck(void)
 {
     set(TCK, 1);
-    delay(TCKWAIT);
+    delayMicroseconds(TCKWAIT);
     set(TCK, 0);
-    delay(TCKWAIT);
+    delayMicroseconds(TCKWAIT);
 }
 
 void set(uint8_t pin, boolean value)
