@@ -33,7 +33,7 @@ int main(int argc, char* argv[])
    bool manual_mode=false;
 
    string instruction, decodedInstruction, inputArduino, s, s_tmp;
-   vector<string> instructionsFile, bitstream;
+   vector<string> instructionsFile, bitstream, decodedBitstream;
 
    if(argc==2)
    {
@@ -82,10 +82,10 @@ int main(int argc, char* argv[])
                   // Estraiamo vettore di stringhe
                   bitstream = ExtractBitstream(instructionsFile,i);
 
-                  // Specchiamo tutte le stringhe
-                  // ...
+                  // Decodifica del bitstream
+                  decodedBitstream = GenerateBITSTREAMOutput(bitstream);
 
-                  // Ciclo di stampa sulla seriale dall'ultima stringa ricevuta fino alla prima
+                  // Ciclo di stampa sulla seriale
                   // ...
 
                   // Aggiorniamo i in modo che salti tutto il bitstream
@@ -191,8 +191,8 @@ vector<string> ExtractInstruction(ifstream& is)
 vector<string> ExtractBitstream(vector<string> instructionsFile, long int currentIndex)
 {
       vector<string> stream;
-      string tmp;
-      int i = 0;
+      string tmp, tmp2;
+      int i = 0, k = 0;
 
       // Prima riga: ignoro tutto ciò che viene prima delle parentesi
       while(instructionsFile[currentIndex][i] != '(')
@@ -219,6 +219,15 @@ vector<string> ExtractBitstream(vector<string> instructionsFile, long int curren
             stream.push_back(instructionsFile[currentIndex]);
             currentIndex++;
       }
+
+      // Immetto ultima fino al ')'
+      while(instructionsFile[currentIndex][k] != ')')
+      {
+            tmp2 += instructionsFile[currentIndex][k];
+            k++;
+      }
+
+      stream.push_back(tmp2);
 
       return stream;
 }

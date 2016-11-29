@@ -145,6 +145,53 @@ string GenerateRUNTESTOutput (string line) // Genera output per le istruzioni RU
 		// La seriale va in timeout... pensare workaround
 }
 
+vector<string> GenerateBITSTREAMOutput(vector<string> bitstream)
+{
+	vector<string> decBitstream;
+
+	// Il bitstream va inserito al contrario: dall'ultima riga alla prima
+	for(int i = bitstream.size() - 1; i >= 0; i--)
+	{
+		string str = "";
+
+		if(i == bitstream.size() - 1)
+			str += "!*";
+
+		for (int k = bitstream[i].length()-1; k >= 0; k--)
+		{
+			if(i == 0 && k == 0)
+			{
+				string binval = hexCharToBin(bitstream[i][k]);
+
+				for (i=binval.length()-1; i>0; i--)
+				{
+					if (binval[i]=='0') 
+						str += ".";
+					else if(binval[i]=='1') 
+						str += ",";
+				}
+
+				if (binval[i]=='0') 
+					str += ":";
+				else if (binval[i]=='1') 
+					str += ";";
+
+				continue;
+			}
+
+			if(bitstream[i][k] != '\n')
+				str += bitstream[i][k];
+		}
+
+		if(i == 0)
+			str+= "!*\n";
+
+		decBitstream.push_back(str);
+	}
+
+	return decBitstream;
+}
+
 string hexstrToBinstr(string hex)	// Funzione di conversione stringa esadecimale in stringa binaria
 {
 		string bin;
