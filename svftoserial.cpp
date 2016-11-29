@@ -179,7 +179,7 @@ vector<string> GenerateBITSTREAMOutput(vector<string> bitstream)
 				continue;
 			}
 
-			if(bitstream[i][k] != '\n')
+			if(bitstream[i][k] != '\n' && bitstream[i][k] != '\r')
 				str += bitstream[i][k];
 		}
 
