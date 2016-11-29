@@ -23,9 +23,9 @@ using namespace std;
 int main(int argc, char* argv[])
 {
    Serial serialPort;
-   //ifstream svf_file("blink_led.svf", fstream::in);
+   ifstream svf_file("blink_led.svf", fstream::in);
    //ifstream svf_file("myidcode.svf", fstream::in);
-   ifstream svf_file("bitstreamtest.svf", fstream::in);
+   //ifstream svf_file("bitstreamtest.svf", fstream::in);
    unsigned ret;
    
    char buffer[BUFFER_SIZE];
@@ -100,15 +100,17 @@ int main(int argc, char* argv[])
 
                         // Leggiamo cosa risponde la seriale se la decodedInstruction è diversa da stringa vuota
                         // Ciclo di attesa per dare il tempo all'Arduino di rispondere
+                        if (decodedBitstream[j] != "\n")
+                        {
+                              do {
+                                    ret = serialPort.ReadString(buffer,'\n', BUFFER_MAX_SIZE, 0);
+                                    s_tmp = string(buffer);
+                                    SanitizeInput(s_tmp);
 
-                        do {
-                              ret = serialPort.ReadString(buffer,'\n', BUFFER_MAX_SIZE, 5000);
-                              s_tmp = string(buffer);
-                              SanitizeInput(s_tmp);
-
-                              // Ricaviamo la risposta dell'arduino
-                              inputArduino = ExtractAnswer(s_tmp);
-                        } while (decodedBitstream[j].compare(inputArduino) != 1); // Continua finchè le stringhe non sono uguali
+                                    // Ricaviamo la risposta dell'arduino
+                                    inputArduino = ExtractAnswer(s_tmp);
+                              } while (decodedBitstream[j].compare(inputArduino) != 1); // Continua finchè le stringhe non sono uguali
+                        }
 
                         cout << " Progresso: " << j << "/" << decodedBitstream.size() << "\r" << flush;
 
