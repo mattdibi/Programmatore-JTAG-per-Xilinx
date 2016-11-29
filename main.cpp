@@ -96,21 +96,18 @@ int main(int argc, char* argv[])
                         sleep(1);
 
                         // Leggiamo cosa risponde la seriale se la decodedInstruction è diversa da stringa vuota
-                        if (decodedInstruction != "\n")
-                        {
-                              // Ciclo di attesa per dare il tempo all'Arduino di rispondere
-                              do {
-                                    ret = serialPort.ReadString(buffer,'\n', BUFFER_MAX_SIZE, 5000);
-                                    s_tmp = string(buffer);
-                                    SanitizeInput(s_tmp);
+                        // Ciclo di attesa per dare il tempo all'Arduino di rispondere
+                        do {
+                              ret = serialPort.ReadString(buffer,'\n', BUFFER_MAX_SIZE, 5000);
+                              s_tmp = string(buffer);
+                              SanitizeInput(s_tmp);
 
-                                    // Ricaviamo la risposta dell'arduino
-                                    inputArduino = ExtractAnswer(s_tmp);
-                              } while (decodedBitstream[j].compare(inputArduino) != 1); // Continua finchè le stringhe non sono uguali
+                              // Ricaviamo la risposta dell'arduino
+                              inputArduino = ExtractAnswer(s_tmp);
+                        } while (decodedBitstream[j].compare(inputArduino) != 1); // Continua finchè le stringhe non sono uguali
 
-                              // Printa la risposta dell'Arduino
-                              cout << "<arduino> " << endl << s_tmp << "</arduino>" << endl;
-                        }
+                        // Printa la risposta dell'Arduino
+                        cout << "<arduino> " << endl << s_tmp << "</arduino>" << endl;
                   }
 
                   // Aggiorniamo i in modo che salti tutto il bitstream
