@@ -42,7 +42,7 @@ int main(int argc, char* argv[])
    }
    try
    {
-      serialPort.Open(DEVICE_PORT,9600);
+      serialPort.Open(DEVICE_PORT,115200);
       cout<<"Serial port opened successfully!"<<endl;
       serialPort.FlushReceiver();
       //serialPort.ReadString(buffer, '\n', BUFFER_SIZE, 10000);
@@ -90,10 +90,10 @@ int main(int argc, char* argv[])
                   {     
                         decodedBitstream[j] += '\n'; //perché sennò la seriale si incazza
 
-                        cout << "Decoded instruction[" << j << "]: " << decodedBitstream[j];
+                        //cout << "Decoded instruction[" << j << "]: " << decodedBitstream[j];
 
                         serialPort.WriteString(decodedBitstream[j].c_str());
-                        sleep(1);
+                        //sleep(1);
 
                         // Leggiamo cosa risponde la seriale se la decodedInstruction è diversa da stringa vuota
                         // Ciclo di attesa per dare il tempo all'Arduino di rispondere
@@ -106,8 +106,10 @@ int main(int argc, char* argv[])
                               inputArduino = ExtractAnswer(s_tmp);
                         } while (decodedBitstream[j].compare(inputArduino) != 1); // Continua finchè le stringhe non sono uguali
 
+                        cout << " Progress: " << j << "/" << decodedBitstream.size() << "\r" << flush;
+
                         // Printa la risposta dell'Arduino
-                        cout << "<arduino> " << endl << s_tmp << "</arduino>" << endl;
+                        //cout << "<arduino> " << endl << s_tmp << "</arduino>" << endl;
                   }
 
                   // Aggiorniamo i in modo che salti tutto il bitstream

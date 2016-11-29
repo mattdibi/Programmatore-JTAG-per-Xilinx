@@ -16,6 +16,7 @@
 #define XONXOFF 0       // Send software flow control characters?
 #define TCKWAIT 1       // ms delay between clock edges
 #define VERBOSITY 2 	    // Set to increase verbosity [0 = min, 2 = max]
+#define BAUDRATE 115200
 
 //#define DEBUG
 
@@ -108,7 +109,7 @@ void setup()
 
     pinMode(CTS, OUTPUT);
 
-    Serial.begin(9600);
+    Serial.begin(BAUDRATE);
 
 #if QUIET == 0
 	// Startup banner
