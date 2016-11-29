@@ -5,7 +5,7 @@
 #include "serial.hpp"
 #include "svftoserial.hpp"
 
-#define DEVICE_PORT "/dev/ttyACM0"
+#define DEVICE_PORT "/dev/ttyUSB0"
 
 const unsigned BUFFER_SIZE=4096;
 const unsigned long BUFFER_MAX_SIZE=200000000;

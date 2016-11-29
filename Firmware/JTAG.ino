@@ -28,7 +28,7 @@
 
 #define TMS 8
 #define TDI 9
-#define TDO 10 //Pin 10 broken
+#define TDO 36 //Pin 10 broken
 #define TCK 11
 
 // Optional hardware flow control
