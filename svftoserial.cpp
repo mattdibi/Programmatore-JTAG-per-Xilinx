@@ -127,22 +127,23 @@ string GenerateSTATEOutput (string line) // Genera output per le istruzioni STAT
 
 string GenerateRUNTESTOutput (string line) // Genera output per le istruzioni RUNTEST
 {
-		// istringstream iss(line);
-		// string sub, str;
-		// int n, i;
+		istringstream iss(line);
+		string sub, str;
+		int n, i;
 
-		// iss >> sub; 					// Scarta nome comando
-		// iss >> n;
+		iss >> sub; 					// Scarta nome comando
+		iss >> n;
 
-		// for (i=0; i < n/4; i++)			// Assumendo che i cicli di clock indicati siano divisibili per 4
-		// {
-		// 	str += '0';					// Tanti '0' quanti sono i cicli di clock richiesti divisi per 4
-		// }
+		// TODO: Fixare
+		if(n > 100)
+			n = 100;
 
-		// return str;
+		for (i=0; i < n/4; i++)			// Assumendo che i cicli di clock indicati siano divisibili per 4
+		{
+			str += '0';					// Tanti '0' quanti sono i cicli di clock richiesti divisi per 4
+		}
 
-		return "";
-		// La seriale va in timeout... pensare workaround
+		return str;
 }
 
 vector<string> GenerateBITSTREAMOutput(vector<string> bitstream)
