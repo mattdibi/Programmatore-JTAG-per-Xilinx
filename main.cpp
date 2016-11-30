@@ -23,9 +23,9 @@ using namespace std;
 int main(int argc, char* argv[])
 {
    Serial serialPort;
-   //ifstream svf_file("blink_led.svf", fstream::in);
+   ifstream svf_file("blink_led.svf", fstream::in);
    //ifstream svf_file("myidcode.svf", fstream::in);
-   ifstream svf_file("bitstreamtest.svf", fstream::in);
+   //ifstream svf_file("bitstreamtest.svf", fstream::in);
    unsigned ret;
    
    char buffer[BUFFER_SIZE];
@@ -93,7 +93,7 @@ int main(int argc, char* argv[])
                   {     
                         decodedBitstream[j] += '\n'; //perché sennò la seriale si incazza
 
-                        //cout << "Decoded instruction[" << j << "]: " << decodedBitstream[j];
+                        cout << "Decoded instruction[" << j << "/" << decodedBitstream.size() << "]: " << decodedBitstream[j];
 
                         serialPort.WriteString(decodedBitstream[j].c_str());
                         //usleep(10000);
@@ -112,10 +112,10 @@ int main(int argc, char* argv[])
                               } while (decodedBitstream[j].compare(inputArduino) != 1); // Continua finchè le stringhe non sono uguali
                         }
 
-                        cout << " Progresso: " << j << "/" << decodedBitstream.size() << "\r" << flush;
+                        //cout << " Progresso: " << j << "/" << bitstream.size() << "\r" << flush;
 
                         // Printa la risposta dell'Arduino
-                        //cout << "<arduino> " << endl << s_tmp << "</arduino>" << endl;
+                        cout << "<arduino> " << endl << s_tmp << "</arduino>" << endl;
                   }
 
                   cout << "\nUpload completato.";

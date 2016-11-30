@@ -149,16 +149,45 @@ string GenerateRUNTESTOutput (string line) // Genera output per le istruzioni RU
 vector<string> GenerateBITSTREAMOutput(vector<string> bitstream)
 {
 	vector<string> decBitstream;
+	int indexRow, indexCol, initialCol;
+	bool found = false;
+
+	// Ciclo di ignore fino a ")"
+	indexRow  = bitstream.size() - 1;
+
+	while(indexRow >= 0 && found == false)
+	{
+		indexCol = bitstream[indexRow].length();
+
+		while(indexCol >= 0 && found == false)
+		{
+			if(bitstream[indexRow][indexCol] == ')')
+				found = true;
+
+			indexCol--;
+		}
+
+		indexRow--;
+	}
+
+	indexRow++;
 
 	// Il bitstream va inserito al contrario: dall'ultima riga alla prima
-	for(int i = bitstream.size() - 1; i >= 0; i--)
+	for(int i = indexRow; i >= 0; i--)
 	{
 		string str = "";
 
-		if(i == bitstream.size() - 1)
+		if(i == indexRow)
+		{
 			str += "!*";
+			initialCol = indexCol;
+		}
+		else
+		{
+			initialCol = bitstream[i].length()-1;
+		}
 
-		for (int k = bitstream[i].length()-1; k >= 0; k--)
+		for (int k = initialCol; k >= 0; k--)
 		{
 			if(i == 0 && k == 0)
 			{
