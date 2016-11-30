@@ -26,6 +26,7 @@ int main(int argc, char* argv[])
    ifstream svf_file("blink_led.svf", fstream::in);
    //ifstream svf_file("myidcode.svf", fstream::in);
    //ifstream svf_file("bitstreamtest.svf", fstream::in);
+   //ifstream svf_file("bitstreamquicktest.svf", fstream::in);
    unsigned ret;
    
    char buffer[BUFFER_SIZE];
@@ -89,7 +90,7 @@ int main(int argc, char* argv[])
                   // Ciclo di stampa sulla seriale
                   cout << "Upload bitstream in corso:\n";
 
-                  for(int j = 0; j < decodedBitstream.size(); j++)
+                  for(int j = 0; j < decodedBitstream.size() - 1; j++)
                   {     
                         decodedBitstream[j] += '\n'; //perché sennò la seriale si incazza
 
@@ -112,7 +113,7 @@ int main(int argc, char* argv[])
                               } while (decodedBitstream[j].compare(inputArduino) != 1); // Continua finchè le stringhe non sono uguali
                         }
 
-                        //cout << " Progresso: " << j << "/" << bitstream.size() << "\r" << flush;
+                        //cout << " Progresso: " << j << "/" << bitstream.size()-1 << "\r" << flush;
 
                         // Printa la risposta dell'Arduino
                         cout << "<arduino> " << endl << s_tmp << "</arduino>" << endl;
