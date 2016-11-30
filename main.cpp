@@ -90,14 +90,13 @@ int main(int argc, char* argv[])
                   // Ciclo di stampa sulla seriale
                   cout << "Upload bitstream in corso:\n";
 
-                  for(int j = 0; j < decodedBitstream.size() - 1; j++)
+                  for(int j = 0; j < decodedBitstream.size(); j++)
                   {     
                         decodedBitstream[j] += '\n'; //perché sennò la seriale si incazza
 
                         cout << "Decoded instruction[" << j << "/" << decodedBitstream.size() << "]: " << decodedBitstream[j];
 
                         serialPort.WriteString(decodedBitstream[j].c_str());
-                        //usleep(10000);
 
                         // Leggiamo cosa risponde la seriale se la decodedInstruction è diversa da stringa vuota
                         // Ciclo di attesa per dare il tempo all'Arduino di rispondere

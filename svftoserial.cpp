@@ -214,7 +214,7 @@ vector<string> GenerateBITSTREAMOutput(vector<string> bitstream)
 		}
 
 		if(i == 0)
-			str+= "!*\n";
+			str+= "!*";
 
 		decBitstream.push_back(str);
 	}
