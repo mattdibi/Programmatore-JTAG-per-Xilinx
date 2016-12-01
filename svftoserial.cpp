@@ -11,8 +11,6 @@
 // Funzione di decodifica istruzione: prende come argomento la singola linea del file
 // (o più linee riassunte in un'unica stringa nel caso del bitstream); esclude automaticamente
 // commenti, istruzioni TIR, HIR, TDR, HDR e altre istruzioni che non devono generare uscite.
-// Viene passato anche bufdim per eventuali controlli di "sforamento" del buffer, non ancora
-// implementati ma implementabili come miglioria.
 // Come indicato nel file svf specifico "blink_led.svf" si è assunto che lo stato a cui si passa
 // al termine delle SIR e SDR sia quello di IDLE (vederee ENDIR e ENDDR).
 
@@ -22,7 +20,7 @@ string DecodeInstruction (string line)
     {
 	    istringstream iss(line); 				// Necessario per analizzare linea componente per componente
         string sub;
-        iss >> sub;					// Vengono chiamate diverse funzioni a seconda del valore di sub
+        iss >> sub;								// Vengono chiamate diverse funzioni a seconda del valore di sub
 		if (sub == "SDR")			return GenerateSDROutput (line);
 		else if (sub == "SIR") 		return GenerateSIROutput (line);
 		else if (sub == "STATE")	return GenerateSTATEOutput (line);
@@ -56,7 +54,7 @@ string GenerateSDROutput (string line) // Genera output per le istruzioni SDR
 
 		string binval = hexCharToBin(sub[k]);					// Converte ultimo valore esadecimale in stringa binaria
 
-		for (i=binval.length()-1; i>0; i--)					// Sostituisce '.' e ',' a 0 e 1
+		for (i=binval.length()-1; i>0; i--)						// Sostituisce '.' e ',' a 0 e 1
 		{
 			if (binval[i]=='0') 
 				str += ".";
@@ -98,7 +96,7 @@ string GenerateSIROutput (string line) // Genera output per le istruzioni SIR
 				str += ',';
 		}
 
-		// Sostituisce l'ultimo 0 o 1 con ':' o con ';'
+		// Sostituisce l'ultimo bit con ':' o con ';'
 		if (binval[k]=='0') 
 			str += ':';
         else if (binval[k]=='1') 
@@ -129,14 +127,15 @@ string GenerateRUNTESTOutput (string line) // Genera output per le istruzioni RU
 {
 		istringstream iss(line);
 		string sub, str;
-		int n, i;
+		long int n;
+		int i;
 
 		iss >> sub; 					// Scarta nome comando
 		iss >> n;
 
-		// TODO: Fixare
-		if(n > 100)
-			n = 100;
+		// Impostiamo come massimo il numero di caratteri che possiamo inviare sulla seriale
+		if(n > 1000)
+			n = 1000;
 
 		for (i=0; i < n/4; i++)			// Assumendo che i cicli di clock indicati siano divisibili per 4
 		{
@@ -152,9 +151,10 @@ vector<string> GenerateBITSTREAMOutput(vector<string> bitstream)
 	int indexRow, indexCol, initialCol;
 	bool found = false;
 
-	// Ciclo di ignore fino a ")"
+	// Ignoriamo tutti i bit della SMASK
 	indexRow  = bitstream.size() - 1;
 
+	// Ciclo di ignore fino al carattere ')' che segnala la fine della SMASK
 	while(indexRow >= 0 && found == false)
 	{
 		indexCol = bitstream[indexRow].length();
@@ -177,6 +177,8 @@ vector<string> GenerateBITSTREAMOutput(vector<string> bitstream)
 	{
 		string str = "";
 
+		// Se è la prima riga dell'istruzione inseriamo la parte iniziale comune a tutte le istruzioni SDR
+		// e partiamo con la copia dell'istruzione cominciando dalla posizione della ')'
 		if(i == indexRow)
 		{
 			str += "!*";
@@ -184,6 +186,7 @@ vector<string> GenerateBITSTREAMOutput(vector<string> bitstream)
 		}
 		else
 		{
+			// Se non è la prima riga partiamo dall'ultimo carattere della stringa
 			initialCol = bitstream[i].length()-1;
 		}
 
@@ -213,6 +216,7 @@ vector<string> GenerateBITSTREAMOutput(vector<string> bitstream)
 				str += bitstream[i][k];
 		}
 
+		// Se è l'ultima riga immetto la parte finale comune a tutte le istruzioni SDR
 		if(i == 0)
 			str+= "!*";
 
@@ -258,8 +262,3 @@ string hexCharToBin(char c)	// Funzione di conversione valore esadecimale in val
 }
 
 #endif
-
-// Modifiche:
-// 1. In tutte le funzioni l'argomento long int bufdim diventa long int& bufdim
-// 2. Aggiunta inizializzazione bufdim in tutte e 4 le funzioni
-// 3. Aggiunto buffer = new char [bufdim]; in ogni funzione

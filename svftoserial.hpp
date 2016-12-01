@@ -14,7 +14,7 @@ string GenerateSDROutput(string line); // Genera output per le istruzioni SDR
 string GenerateSIROutput(string line); // Genera output per le istruzioni SIR
 string GenerateSTATEOutput(string line); // Genera output per le istruzioni STATE
 string GenerateRUNTESTOutput(string line); // Genera output per le istruzioni RUNTEST
-vector<string> GenerateBITSTREAMOutput(vector<string> bitstream);
+vector<string> GenerateBITSTREAMOutput(vector<string> bitstream); // Genera output per l'istruzione di caricamento del bitstream
 string hexstrToBinstr(string hex);	// Funzione di conversione stringa esadecimale in stringa binaria
 string hexCharToBin(char c);	// Funzione di conversione valore esadecimale in valore binario
 

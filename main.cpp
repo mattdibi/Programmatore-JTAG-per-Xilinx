@@ -5,9 +5,11 @@
 #include "serial.hpp"
 #include "svftoserial.hpp"
 
+// Impostazioni per il corretto funzionamento del programma
 #define DEVICE_PORT "/dev/ttyUSB0"
-#define INSTR_LENGTH 250
+#define INPUT_FILE "blink_led.svf"
 
+#define INSTR_LENGTH 250
 const unsigned BUFFER_SIZE=4096;
 const unsigned long BUFFER_MAX_SIZE=200000000;
 
@@ -23,10 +25,7 @@ using namespace std;
 int main(int argc, char* argv[])
 {
    Serial serialPort;
-   ifstream svf_file("blink_led.svf", fstream::in);
-   //ifstream svf_file("myidcode.svf", fstream::in);
-   //ifstream svf_file("bitstreamtest.svf", fstream::in);
-   //ifstream svf_file("bitstreamquicktest.svf", fstream::in);
+   ifstream svf_file(INPUT_FILE, fstream::in);
    unsigned ret;
    
    char buffer[BUFFER_SIZE];
@@ -37,42 +36,46 @@ int main(int argc, char* argv[])
    string instruction, decodedInstruction, inputArduino, s, s_tmp;
    vector<string> instructionsFile, bitstream, decodedBitstream;
 
-   if(argc==2)
+   if(argc == 2)
    {
       if(!strcmp(argv[1], "-m"))
-         manual_mode=true;
+         manual_mode = true;
    }
    try
    {
       serialPort.Open(DEVICE_PORT,115200);
-      cout<<"Serial port opened successfully!"<<endl;
+      cout << "Porta seriale aperta con successo!\n";
       serialPort.FlushReceiver();
-      //serialPort.ReadString(buffer, '\n', BUFFER_SIZE, 10000);
-      //s=string(buffer);
-      //SanitizeInput(s);
-      //cout<<s<<endl;
+
       if(manual_mode)
       {
-         cin>>s;
-         while(s!="quit")
+         cout << "Modalità manuale.\n";
+         cout << "Inserire comando da inviare (digitare 'quit' per uscire):";
+         cin >> s;
+         while(s != "quit")
          {
-            s+='\n'; // Perché sennò la seriale si incazza
+            s += '\n'; //richiesto dalla seriale
             serialPort.WriteString(s.c_str());
-            //serialPort.FlushReceiver();
-            cout<<"comando da mandare: "<<s<<endl;
+
+            cout << "Comando immesso: " << s;
             sleep(1);
+
+            // Leggiamo da seriale
             serialPort.ReadString(buffer, '\n', BUFFER_SIZE, 5000);
-            s=string(buffer);
+            s = string(buffer);
             SanitizeInput(s);
-            cout<<"---------------------------------------------------------"<<endl<<s<<"---------------------------------------------------------"<<endl;
-            cin>>s;
+            // Stampiamo risposta
+            cout << endl << s << endl;
+
+            cout << "Nuovo comando:";
+            cin >> s;
          }
       }
       else
       {
-         cout << "Entrato nel ciclo for" << endl;
-
          instructionsFile = ExtractInstruction(svf_file);
+
+         cout << "Entrato nel ciclo for\n";
          
          for(long int i = 0; i < instructionsFile.size(); i++)
          {
@@ -87,22 +90,24 @@ int main(int argc, char* argv[])
                   // Decodifica del bitstream
                   decodedBitstream = GenerateBITSTREAMOutput(bitstream);
 
-                  // Ciclo di stampa sulla seriale
                   cout << "Upload bitstream in corso:\n";
 
+                   // Ciclo di stampa sulla seriale
                   for(int j = 0; j < decodedBitstream.size(); j++)
                   {     
-                        decodedBitstream[j] += '\n'; //perché sennò la seriale si incazza
+                        decodedBitstream[j] += '\n'; //richiesto dalla seriale
 
-                        cout << "Decoded instruction[" << j << "/" << decodedBitstream.size() << "]: " << decodedBitstream[j];
+                        // Printa l'istruzione decodificata
+                        //cout << "Decoded instruction[" << j << "/" << decodedBitstream.size() << "]: " << decodedBitstream[j];
 
                         serialPort.WriteString(decodedBitstream[j].c_str());
 
                         // Leggiamo cosa risponde la seriale se la decodedInstruction è diversa da stringa vuota
-                        // Ciclo di attesa per dare il tempo all'Arduino di rispondere
                         if (decodedBitstream[j] != "\n")
                         {
+                              // Ciclo di sincronizzazione
                               do {
+                                    // Leggiamo da seriale
                                     ret = serialPort.ReadString(buffer,'\n', BUFFER_MAX_SIZE, 5000);
                                     s_tmp = string(buffer);
                                     SanitizeInput(s_tmp);
@@ -112,23 +117,27 @@ int main(int argc, char* argv[])
                               } while (decodedBitstream[j].compare(inputArduino) != 1); // Continua finchè le stringhe non sono uguali
                         }
 
-                        //cout << " Progresso: " << j << "/" << bitstream.size()-1 << "\r" << flush;
+                        // Printa il progresso dell'upload
+                        cout << " Progresso: " << j << "/" << decodedBitstream.size()-1 << "\r" << flush;
 
                         // Printa la risposta dell'Arduino
-                        cout << "<arduino> " << endl << s_tmp << "</arduino>" << endl;
+                        //cout << "<arduino> " << endl << s_tmp << "</arduino>\n";
                   }
 
-                  cout << "\nUpload completato.";
+                  cout << "\nUpload bitstream completato.";
 
-                  // Aggiorniamo i in modo che salti tutto il bitstream
+                  // Aggiorniamo l'indice "i" in modo che salti tutto il bitstream nel vettore di stringhe
                   i += (bitstream.size() - 1);
             }
             else
             {
+                  // Decodifica dell'istruzione
                   decodedInstruction = DecodeInstruction(instructionsFile[i]);
+
                   if (decodedInstruction != "")
-                        cout << "Decoded instruction: " << decodedInstruction << endl;
-                  decodedInstruction += '\n'; //perché sennò la seriale si incazza
+                        cout << "Istruzione decodificata: " << decodedInstruction << endl;
+
+                  decodedInstruction += '\n'; //richiesto dalla seriale
 
                   serialPort.WriteString(decodedInstruction.c_str());
                   sleep(1);
@@ -136,8 +145,9 @@ int main(int argc, char* argv[])
                   // Leggiamo cosa risponde la seriale se la decodedInstruction è diversa da stringa vuota
                   if (decodedInstruction != "\n")
                   {
-                        // Ciclo di attesa per dare il tempo all'Arduino di rispondere
+                        // Ciclo di sincronizzazione
                         do {
+                              // Leggiamo da seriale
                               ret = serialPort.ReadString(buffer,'\n', BUFFER_MAX_SIZE, 5000);
                               s_tmp = string(buffer);
                               SanitizeInput(s_tmp);
@@ -152,7 +162,7 @@ int main(int argc, char* argv[])
             }
 
          }
-         cout << "Update successful" << endl;
+         cout << "Update completato" << endl;
       }
    }
    catch(TimeoutException& e)
@@ -173,6 +183,7 @@ int main(int argc, char* argv[])
 
 void SanitizeInput(string& s)
 {
+   // Questa funzione permette la stampa sul terminale corretta dell'output dell'arduino
    for(int i=0; i<s.length(); i++)
       if(s[i]=='\t')
          s[i]='\n';
@@ -193,13 +204,14 @@ vector<string> ExtractInstruction(ifstream& is)
 
       if(ch==EOF)
             continue;
-      else if(ch=='/')
+      else if(ch=='/') // se è un commento ignoriamo tutto
       {
             is.ignore(100, '\n');
             continue;
       }
       else
       {
+            // raccolgo i caratteri della riga finchè non incontro un \n o raggiungo la massima lunghezza della istruzione permessa
             do
             {
                   n++;
@@ -207,12 +219,14 @@ vector<string> ExtractInstruction(ifstream& is)
                   ch=is.get();
             }while(ch != '\n' && n < INSTR_LENGTH);
 
+            // se raggiungo la massima lunghezza della istruzione inserisco un \n come carattere finale
             if(n >= INSTR_LENGTH)
             {
                   s+=ch;
                   s+='\n';
             }
             
+            // carico nel vettore la stringa così costruita
             instruction.push_back(s);
       }
    }
@@ -234,6 +248,7 @@ vector<string> ExtractBitstream(vector<string> instructionsFile, long int curren
 
       i++;
 
+      // Arrivato alla parentesi prendo tutto
       while(instructionsFile[currentIndex][i] != '\n' && instructionsFile[currentIndex][i] != '\r')
       {
             tmp += instructionsFile[currentIndex][i];
@@ -244,15 +259,14 @@ vector<string> ExtractBitstream(vector<string> instructionsFile, long int curren
 
       currentIndex++;
 
-      // Immetto righe finchè l'ultimo carattere di una riga è ')'
-      // NB: Non è metodo molto robusto per cercare il carattere finale
+      // Immetto righe finchè l'ultimo carattere di una riga è ')' si noti che così viene caricata anche l'SMASK
       while(instructionsFile[currentIndex][instructionsFile[currentIndex].size() - 4] != ')')
       {
             stream.push_back(instructionsFile[currentIndex]);
             currentIndex++;
       }
 
-      // Immetto ultima fino al ')'
+      // Immetto ultima riga fino al carattere di ')'
       while(instructionsFile[currentIndex][k] != ')')
       {
             tmp2 += instructionsFile[currentIndex][k];
