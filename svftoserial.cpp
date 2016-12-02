@@ -16,11 +16,15 @@
 
 string DecodeInstruction (string line) 
 {
-	if (isalpha(line[0]) && isupper(line[0])) 	// Serve per non considerare commenti
+	// Serve per non considerare commenti
+	if (isalpha(line[0]) && isupper(line[0]))
     {
-	    istringstream iss(line); 				// Necessario per analizzare linea componente per componente
+		// Necessario per analizzare linea componente per componente
+	    istringstream iss(line);
         string sub;
-        iss >> sub;								// Vengono chiamate diverse funzioni a seconda del valore di sub
+        iss >> sub;
+
+		// Vengono chiamate diverse funzioni a seconda del valore di sub
 		if (sub == "SDR")			return GenerateSDROutput (line);
 		else if (sub == "SIR") 		return GenerateSIROutput (line);
 		else if (sub == "STATE")	return GenerateSTATEOutput (line);
@@ -33,28 +37,36 @@ string DecodeInstruction (string line)
 	}
 }
 
-string GenerateSDROutput (string line) // Genera output per le istruzioni SDR
+string GenerateSDROutput (string line)
 {
 		istringstream iss(line);
 		string sub, str;
-		long int n, k;											// n assunto divisibile per 4, altrimenti ulteriori controlli da implementare
+		long int n, k;
 		int i;
 
-		iss >> sub; 											// Scarta nome comando
-		iss >> n;												// Memorizza dimensione dati, utilizzabile per verifica
-		iss >> sub; 											// Scarta parametro
-		iss >> sub;												// Prende dati in esadecimale tra parentesi
+		// Scarta nome comando
+		iss >> sub;
+		// Memorizza dimensione dati, utilizzabile per verifica
+		iss >> n;
+		// Scarta parametro
+		iss >> sub;
+		// Prende dati in esadecimale tra parentesi
+		iss >> sub;
 		
+		// Inserisce parte iniziale comune per tutte le SDR
 		str += "!*";
 		
-		for (k = sub.length()-2; k>1; k--)						// Conteggio da ultimo carattere escludendo parentesi di chiusura
-		{														// e di apertura
+		// Conteggio da ultimo carattere escludendo parentesi di chiusura e di apertura
+		for (k = sub.length()-2; k>1; k--)
+		{
 			str += sub[k];
 		}
 
-		string binval = hexCharToBin(sub[k]);					// Converte ultimo valore esadecimale in stringa binaria
+		// Converte ultimo valore esadecimale in stringa binaria
+		string binval = hexCharToBin(sub[k]);
 
-		for (i=binval.length()-1; i>0; i--)						// Sostituisce '.' e ',' a 0 e 1
+		// Sostituisce '.' e ',' a 0 e 1
+		for (i=binval.length()-1; i>0; i--)
 		{
 			if (binval[i]=='0') 
 				str += ".";
@@ -72,23 +84,31 @@ string GenerateSDROutput (string line) // Genera output per le istruzioni SDR
 		return str;
 }
 
-string GenerateSIROutput (string line) // Genera output per le istruzioni SIR
+string GenerateSIROutput (string line)
 {
 		istringstream iss(line);
 		string sub, str;
 		int n, k;
 
-		iss >> sub; 											// Scarta nome comando
-		iss >> n;												// Memorizza lunghezza istruzione
-		iss >> sub; 											// Scarta parametro
-		iss >> sub;												// Prende istruzione in esadecimale tra parentesi
+		// Scarta nome comando
+		iss >> sub;
+		// Memorizza dimensione dati, utilizzabile per verifica
+		iss >> n;
+		// Scarta parametro
+		iss >> sub;
+		// Prende dati in esadecimale tra parentesi
+		iss >> sub;
 
-		string hexval = sub.substr(1,2);						// Preleva parte tra parentesi
-		string binval = hexstrToBinstr(hexval);					// Converte stringa esadecimale in stringa binaria
+		// Preleva parte tra parentesi
+		string hexval = sub.substr(1,2);
+		// Converte stringa esadecimale in stringa binaria
+		string binval = hexstrToBinstr(hexval);
 
-		str += "!!**";											// Inserisce parte iniziale comune per tutte le SIR
+		// Inserisce parte iniziale comune per tutte le SIR
+		str += "!!**";
 		
-		for (k=binval.length()-1; k>binval.length()-n; k--)		// Sostituisce '.' e ',' a 0 e 1
+		// Sostituisce '.' e ',' a 0 e 1
+		for (k=binval.length()-1; k>binval.length()-n; k--)
 		{
 			if (binval[k]=='0') 
 				str += '.';
@@ -102,17 +122,21 @@ string GenerateSIROutput (string line) // Genera output per le istruzioni SIR
         else if (binval[k]=='1') 
 			str += ';';
 
-		str += "!*";											// Inserisce parte finale comune per tutte le SIR
+		// Inserisce parte finale comune per tutte le SIR
+		str += "!*";
 		
 		return str;
 }
 
-string GenerateSTATEOutput (string line) // Genera output per le istruzioni STATE
+string GenerateSTATEOutput (string line)
 {
 		istringstream iss(line);
 		string sub;
-		iss >> sub; 				// Scarta nome comando
-		iss >> sub; 				// Prende nome stato
+
+		// Scarta nome comando
+		iss >> sub;
+		// Prende nome stato
+		iss >> sub;
 		if (sub == "RESET;")
 		{
 			return "!!!!!*";
@@ -123,23 +147,26 @@ string GenerateSTATEOutput (string line) // Genera output per le istruzioni STAT
 		}
 }
 
-string GenerateRUNTESTOutput (string line) // Genera output per le istruzioni RUNTEST
+string GenerateRUNTESTOutput (string line)
 {
 		istringstream iss(line);
 		string sub, str;
 		long int n;
 		int i;
 
-		iss >> sub; 					// Scarta nome comando
+		// Scarta nome comando
+		iss >> sub;
 		iss >> n;
 
 		// Impostiamo come massimo il numero di caratteri che possiamo inviare sulla seriale
 		if(n > 1000)
 			n = 1000;
 
-		for (i=0; i < n/4; i++)			// Assumendo che i cicli di clock indicati siano divisibili per 4
+		// Assumendo che i cicli di clock indicati siano divisibili per 4
+		for (i=0; i < n/4; i++)
 		{
-			str += '0';					// Tanti '0' quanti sono i cicli di clock richiesti divisi per 4
+			// Tanti '0' quanti sono i cicli di clock richiesti divisi per 4
+			str += '0';
 		}
 
 		return str;
