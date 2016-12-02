@@ -3,31 +3,46 @@
 
 #include "serial.hpp"
 
+// Costruttore
 Serial::Serial()
 {}
 
+// Distruttore
 Serial::~Serial()
 {
+    // Se la comunicazione seriale è aperta, chiude la connessione
     Close();
 }
 
+// Apre la connessione seriale
 void Serial::Open(const char *Device,const unsigned Bauds)
 {
-   
+   // Struttura per memorizzare i parametri della connessione
    struct termios options;
 
-   fd = open(Device, O_RDWR | O_NOCTTY | O_NDELAY);                    
+   // Apre la connessione in lettura/scrittura
+   fd = open(Device, O_RDWR | O_NOCTTY | O_NDELAY);
    if (fd == -1)
+   {
+      // Se non è possibile aprire la connessione, lancia un'eccezione
       throw ErrorOpeningException();
+   }
 
+   // Impostazione dei flag per la seriale
    fcntl(fd, F_SETFL, FNDELAY);
+
+   // Impostazione del puntatore della struttura per le opzioni
    tcgetattr(fd, &options);
+
+   // Azzeramento la struttura options
    bzero(&options, sizeof(options));
+
+   // Impostazione la velocità della seriale
    speed_t Speed;
    switch (Bauds)
    {
       case 110:
-         Speed=B110; 
+         Speed=B110;
          break;
       case 300:
          Speed=B300;
@@ -64,6 +79,8 @@ void Serial::Open(const char *Device,const unsigned Bauds)
    }
    cfsetispeed(&options, Speed);
    cfsetospeed(&options, Speed);
+
+   // Impostazione dei flag
    options.c_cflag |= ( CLOCAL | CREAD |  CS8);
    options.c_iflag |= ( IGNPAR | IGNBRK );
    options.c_cc[VTIME]=0;
@@ -72,26 +89,34 @@ void Serial::Open(const char *Device,const unsigned Bauds)
    return;
 }
 
+// Chiude la seriale
 void Serial::Close()
 {
    close (fd);
 }
 
+// Scrive un carattere sulla seriale, lancia un'eccezione in caso di errore
 void Serial::WriteChar(const char Byte)
 {
    if (write(fd,&Byte,1)!=1)
+   {
       throw ErrorWriteException();
+   }
    return;
 }
 
+// Scrive una stringa sulla seriale, lancia un'eccezione in caso di errore
 void Serial::WriteString(const char *String)
 {
    int length=strlen(String);
    if (write(fd,String,length)!=length)
+   {
       throw ErrorWriteException();
+   }
    return;
 }
 
+// Scrive un buffer di caratteri sulla seriale, lancia un'eccezione in caso di errore
 void Serial::Write(const void *Buffer, const unsigned NbBytes)
 {
    if (write (fd,Buffer,NbBytes)!=(ssize_t)NbBytes)
@@ -99,13 +124,15 @@ void Serial::Write(const void *Buffer, const unsigned NbBytes)
    return;
 }
 
-unsigned Serial::ReadChar(char *pByte,unsigned TimeOut_ms)
+// Legge un carattere sulla seriale, lancia un'eccezione in caso di errore
+unsigned Serial::ReadChar(char *pByte, unsigned TimeOut_ms)
 {
+   // Timer per la gestione del timeout
    TimeOut Timer;
    Timer.InitTimer();
    while (Timer.ElapsedTime_ms()<TimeOut_ms || TimeOut_ms==0)
    {
-      switch (read(fd,pByte,1)) 
+      switch (read(fd,pByte,1))
       {
          case -1: throw ErrorReadException();
          case 1 : return 1;
@@ -114,6 +141,7 @@ unsigned Serial::ReadChar(char *pByte,unsigned TimeOut_ms)
    throw TimeoutException();
 }
 
+// Scrive una stringa sulla seriale senza considerare un timeout, lancia un'eccezione in caso di errore
 unsigned Serial::ReadStringNoTimeOut(char *String, char FinalChar, unsigned MaxNbBytes)
 {
    unsigned NbBytes=0;
@@ -130,28 +158,39 @@ unsigned Serial::ReadStringNoTimeOut(char *String, char FinalChar, unsigned MaxN
          }
          NbBytes++;
       }
-      else 
-         throw ErrorReadException(); // ramo inutile, tanto l'eccezione verrebbe lanciata da ReadChar(...)
+      else
+      {
+         // Ramo superfluo in quanto l'eccezione verrebbe lanciata da ReadChar(...)
+         // lasciato per facilitare un eventuale debug
+         throw ErrorReadException();
+      }
    }
    throw ErrorBufferFullException();
 }
 
+// Legge una stringa sulla seriale, lancia un'eccezione in caso di errore
 unsigned Serial::ReadString(char *String,char FinalChar,unsigned MaxNbBytes,unsigned TimeOut_ms)
 {
+   // Se non è specificato un timeout, usa il metodo senza timeout
    if (TimeOut_ms==0)
       return ReadStringNoTimeOut(String,FinalChar,MaxNbBytes);
    unsigned NbBytes=0;
    unsigned ret;
+
+   // Timer la gestione del timeout
    TimeOut Timer;
    long int TimeOutParam;
+
+   // Inizializza il timer
    Timer.InitTimer();
 
    while (NbBytes<MaxNbBytes)
    {
+      // Tempo trascorso
       TimeOutParam=TimeOut_ms-Timer.ElapsedTime_ms();
       if (TimeOutParam>0)
       {
-         ret=ReadChar(&String[NbBytes],TimeOutParam);           
+         ret=ReadChar(&String[NbBytes],TimeOutParam);
          if (ret==1)
          {
             if (String[NbBytes]==FinalChar)
@@ -161,10 +200,10 @@ unsigned Serial::ReadString(char *String,char FinalChar,unsigned MaxNbBytes,unsi
             }
             NbBytes++;
          }
-         else 
+         else
           throw ErrorReadException();
       }
-      if (Timer.ElapsedTime_ms()>TimeOut_ms) 
+      if (Timer.ElapsedTime_ms()>TimeOut_ms)
       {
          String[NbBytes]='\0';
          throw TimeoutException();
@@ -173,19 +212,22 @@ unsigned Serial::ReadString(char *String,char FinalChar,unsigned MaxNbBytes,unsi
    throw ErrorBufferFullException();
 }
 
-
+// Legge un buffer di caratteri sulla seriale, lancia un'eccezione in caso di errore
 unsigned Serial::Read (void *Buffer,unsigned MaxNbBytes,unsigned TimeOut_ms)
 {
+   // Timer per gestire il timeout
    TimeOut Timer;
+
+   // Inizializza il timer
    Timer.InitTimer();
    unsigned NbByteRead=0;
    while (Timer.ElapsedTime_ms()<TimeOut_ms || TimeOut_ms==0)
    {
       unsigned char* Ptr=(unsigned char*)Buffer+NbByteRead;
       int Ret=read(fd,(void*)Ptr,MaxNbBytes-NbByteRead);
-      if (Ret==-1) 
+      if (Ret==-1)
          throw ErrorReadException();
-      if (Ret>0) 
+      if (Ret>0)
       {
          NbByteRead+=Ret;
          if (NbByteRead>=MaxNbBytes)
@@ -195,11 +237,13 @@ unsigned Serial::Read (void *Buffer,unsigned MaxNbBytes,unsigned TimeOut_ms)
    throw TimeoutException();
 }
 
+// Svuota il buffer di lettura
 void Serial::FlushReceiver()
 {
    tcflush(fd,TCIFLUSH);
 }
 
+// Restituisce il numero di caratteri nel buffer di lettura
 int Serial::Peek()
 {
    int Nbytes=0;
@@ -210,11 +254,13 @@ int Serial::Peek()
 TimeOut::TimeOut()
 {}
 
+// Inizializza il timer
 void TimeOut::InitTimer()
 {
    gettimeofday(&PreviousTime, NULL);
 }
 
+// Restituisce il tempo trascorso dall'inizializzazione del timer
 unsigned long int TimeOut::ElapsedTime_ms()
 {
    struct timeval CurrentTime;

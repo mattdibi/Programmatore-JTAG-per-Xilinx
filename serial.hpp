@@ -22,34 +22,46 @@ class Serial
   public:
    Serial();
    ~Serial();
+   // Apre la connessione seriale
    void Open(const char *Device, const unsigned Bauds);
+   // Chiude la seriale
    void Close();
-   void WriteChar(char);
+   // Scrive un carattere sulla seriale, lancia un'eccezione in caso di errore
+   void WriteChar(const char Byte);
+   // Legge un carattere sulla seriale, lancia un'eccezione in caso di errore
    unsigned ReadChar(char *pByte,const unsigned TimeOut_ms=0);
+   // Scrive una stringa sulla seriale, lancia un'eccezione in caso di errore
    void WriteString (const char *String);
+   // Legge una stringa sulla seriale, lancia un'eccezione in caso di errore
    unsigned ReadString(char *String, char FinalChar, unsigned MaxNbBytes, const unsigned TimeOut_ms=0);
-
+   // Scrive un buffer di caratteri sulla seriale, lancia un'eccezione in caso di errore
    void Write(const void *Buffer, const unsigned int NbBytes);
+   // Legge un buffer di caratteri sulla seriale, lancia un'eccezione in caso di errore
    unsigned Read(void *Buffer,unsigned int MaxNbBytes,const unsigned TimeOut_ms=0);
-
+   // Svuota il buffer di lettura
    void FlushReceiver();
-   // Return the number of bytes in the received buffer
+   // Restituisce il numero di caratteri nel buffer di lettura
    int Peek();
   private:
+   // Scrive una stringa sulla seriale senza considerare un timeout, lancia un'eccezione in caso di errore
    unsigned ReadStringNoTimeOut(char *String,char FinalChar,unsigned MaxNbBytes);
    int fd;
 };
 
+// Classe necessaria per gestire i timeout
 class TimeOut
 {
   public:
    TimeOut();
+   // Inizializza il timer
    void InitTimer();
+   // Restituisce il tempo trascorso dall'inizializzazione del timer
    unsigned long int ElapsedTime_ms();
-  private:    
+  private:
    struct timeval PreviousTime;
 };
 
+// Eccezione: buffer pieno
 class ErrorBufferFullException : public exception
 {
   public:
@@ -58,6 +70,7 @@ class ErrorBufferFullException : public exception
       return "Error: buffer full";
    }
 };
+// Eccezione: errore in lettura
 class ErrorReadException : public exception
 {
   public:
@@ -66,6 +79,7 @@ class ErrorReadException : public exception
       return "Error reading";
    }
 };
+// Eccezione: timeout
 class TimeoutException : public exception
 {
   public:
@@ -74,6 +88,7 @@ class TimeoutException : public exception
       return "Timeout expired";
    }
 };
+// Eccezione: errore in scrittura
 class ErrorWriteException : public exception
 {
   public:
@@ -82,7 +97,7 @@ class ErrorWriteException : public exception
       return "Error writing";
    }
 };
-
+// Eccezione: velocità non supportata
 class ErrorSpeedException : public exception
 {
   public:
@@ -91,6 +106,7 @@ class ErrorSpeedException : public exception
       return "Error: baud rate not supported";
    }
 };
+// Eccezione: parametri di connessione non validi
 class ErrorParametersException : public exception
 {
   public:
@@ -99,6 +115,7 @@ class ErrorParametersException : public exception
       return "Error: port parameters not valid";
    }
 };
+// Eccezione: errore in apertura della seriale
 class ErrorOpeningException : public exception
 {
   public:
@@ -107,6 +124,7 @@ class ErrorOpeningException : public exception
       return "Error opening port";
    }
 };
+// Eccezione: seriale non trovata
 class DeviceNotFoundException : public exception
 {
   public:
