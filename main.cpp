@@ -77,7 +77,7 @@ int main(int argc, char* argv[])
 
          cout << "Entrato nel ciclo for\n";
          
-         for(long int i = 0; i < instructionsFile.size(); i++)
+         for(long int i = 0; i < instructionsFile.size() - 1; i++)
          {
             cout << "Stringa da file: " << instructionsFile[i] << endl;
 
@@ -93,7 +93,7 @@ int main(int argc, char* argv[])
                   cout << "Upload bitstream in corso:\n";
 
                    // Ciclo di stampa sulla seriale
-                  for(int j = 0; j < decodedBitstream.size(); j++)
+                  for(long int j = 0; j < decodedBitstream.size(); j++)
                   {     
                         decodedBitstream[j] += '\n'; //richiesto dalla seriale
 
