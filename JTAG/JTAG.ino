@@ -14,7 +14,7 @@
 #define ACTIVE HIGH     // Level of logic 1 on the JTAG lines
 #define QUIET 1        // Set to 1 to remove startup banner
 #define XONXOFF 0       // Send software flow control characters?
-#define TCKWAIT 25      // us delay between clock edges
+#define TCKWAIT 10      // us delay between clock edges
 #define VERBOSITY 2 	    // Set to increase verbosity [0 = min, 2 = max]
 #define BAUDRATE 115200
 
