@@ -77,7 +77,7 @@ int main(int argc, char* argv[])
 
          cout << "Entrato nel ciclo for\n";
          
-         for(long int i = 0; i < instructionsFile.size() - 1; i++)
+         for(long int i = 0; i < instructionsFile.size(); i++)
          {
             cout << "Stringa da file: " << instructionsFile[i] << endl;
 
@@ -230,7 +230,7 @@ vector<string> ExtractInstruction(ifstream& is)
             instruction.push_back(s);
       }
    }
-   instruction.push_back("");
+   
    return instruction;
 }
 

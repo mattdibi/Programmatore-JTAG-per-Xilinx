@@ -16,24 +16,20 @@
 
 string DecodeInstruction (string line) 
 {
-	// Serve per non considerare commenti
-	if (isalpha(line[0]) && isupper(line[0]))
-    {
-		// Necessario per analizzare linea componente per componente
-	    istringstream iss(line);
-        string sub;
-        iss >> sub;
+	// Necessario per analizzare linea componente per componente
+	istringstream iss(line);
+	string sub;
+	iss >> sub;
 
-		// Vengono chiamate diverse funzioni a seconda del valore di sub
-		if (sub == "SDR")			return GenerateSDROutput (line);
-		else if (sub == "SIR") 		return GenerateSIROutput (line);
-		else if (sub == "STATE")	return GenerateSTATEOutput (line);
-		else if (sub == "RUNTEST")	return GenerateRUNTESTOutput (line);
-		else 
-		{
-			// Handler per altri casi
-			return "";
-		}
+	// Vengono chiamate diverse funzioni a seconda del valore di sub
+	if (sub == "SDR")			return GenerateSDROutput (line);
+	else if (sub == "SIR") 		return GenerateSIROutput (line);
+	else if (sub == "STATE")	return GenerateSTATEOutput (line);
+	else if (sub == "RUNTEST")	return GenerateRUNTESTOutput (line);
+	else 
+	{
+		// Handler per altri casi
+		return "";
 	}
 }
 
