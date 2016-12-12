@@ -38,6 +38,7 @@ int main(int argc, char* argv[])
    bool help_mode = false;
 
    ofstream outputFile;
+   string fileName = "arduino_log.txt";
 
    string instruction, decodedInstruction, inputArduino, s, s_tmp;
    vector<string> instructionsFile, bitstream, decodedBitstream;
@@ -59,7 +60,10 @@ int main(int argc, char* argv[])
             file_mode = true;
             cout << "FILE MODE\n";
 
-            outputFile.open("arduino_log.txt");
+            if(argc == 3)
+                  fileName = argv[2];
+
+            outputFile.open(fileName.c_str());
             outputFile << "Arduino output: \n\n";
             outputFile.close();
       }
@@ -100,13 +104,13 @@ int main(int argc, char* argv[])
       }
       else if(help_mode)
       {
-            cout << "\n****************************************************************************************************\n";
+            cout << "\n******************************************************************************************************************************************************************\n";
             cout << "HELP  Modalità disponibili:\n";
-            cout << "NoArg - Modalità normale: prevede il minimo output su terminale possibile. Modalità standard.\n";
-            cout << "-v    - Modalità verbosa: prevede un output su terminale più verboso durante l'upload del bitstream.\n";
-            cout << "-f    - Modalità su file: prevede che l'output della modalità verbosa venga scritto su file.\n";
-            cout << "-h    - Modalità di aiuto: stampa su terminale questo aiuto.\n";
-            cout << "****************************************************************************************************\n\n";
+            cout << "NoArg        - Modalità normale: prevede il minimo output su terminale possibile. Modalità standard.\n";
+            cout << "-v           - Modalità verbosa: prevede un output su terminale più verboso durante l'upload del bitstream.\n";
+            cout << "-f [fileName]- Modalità su file: prevede che l'output della modalità verbosa venga scritto su file. è possibile specificare il nome del file come terzo argomento.\n";
+            cout << "-h           - Modalità di aiuto: stampa su terminale questo aiuto.\n";
+            cout << "******************************************************************************************************************************************************************\n\n";
       }
       else
       {
@@ -165,7 +169,7 @@ int main(int argc, char* argv[])
                         
                         if(file_mode)
                         {
-                              outputFile.open("arduino_log.txt", ios::app);
+                              outputFile.open(fileName.c_str(), ios::app);
                               outputFile << "Risposta arduino riga "<< j << "/" << (decodedBitstream.size() - 1) << "\n" << s_tmp;
                               outputFile.close();
                         }
@@ -212,7 +216,7 @@ int main(int argc, char* argv[])
          cout << "Update completato" << endl;
 
          if(file_mode)
-            cout << "File di log creato nella cartella. Controlla arduino_log.txt!\n";
+            cout << "File di log creato nella cartella. Controlla " << fileName << "!\n";
       }
    }
    catch(TimeoutException& e)
