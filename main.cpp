@@ -35,6 +35,7 @@ int main(int argc, char* argv[])
    bool manual_mode = false;
    bool verbose_mode = false;
    bool file_mode = false;
+   bool help_mode = false;
 
    ofstream outputFile;
 
@@ -61,6 +62,10 @@ int main(int argc, char* argv[])
             outputFile.open("arduino_log.txt");
             outputFile << "Arduino output: \n\n";
             outputFile.close();
+      }
+      else if(!strcmp(argv[1], "-h"))
+      {
+            help_mode = true;
       }
    }
    try
@@ -92,6 +97,16 @@ int main(int argc, char* argv[])
             cout << "Nuovo comando:";
             cin >> s;
          }
+      }
+      else if(help_mode)
+      {
+            cout << "\n****************************************************************************************************\n";
+            cout << "HELP  Modalità disponibili:\n";
+            cout << "NoArg - Modalità normale: prevede il minimo output su terminale possibile. Modalità standard.\n";
+            cout << "-v    - Modalità verbosa: prevede un output su terminale più verboso durante l'upload del bitstream.\n";
+            cout << "-f    - Modalità su file: prevede che l'output della modalità verbosa venga scritto su file.\n";
+            cout << "-h    - Modalità di aiuto: stampa su terminale questo aiuto.\n";
+            cout << "****************************************************************************************************\n\n";
       }
       else
       {
