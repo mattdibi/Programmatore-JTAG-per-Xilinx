@@ -31,15 +31,37 @@ int main(int argc, char* argv[])
    char buffer[BUFFER_SIZE];
    char* instruction_buffer;
    long int ib_length;
-   bool manual_mode=false;
+
+   bool manual_mode = false;
+   bool verbose_mode = false;
+   bool file_mode = false;
+
+   ofstream outputFile;
 
    string instruction, decodedInstruction, inputArduino, s, s_tmp;
    vector<string> instructionsFile, bitstream, decodedBitstream;
 
-   if(argc == 2)
+   if(argc >= 2)
    {
       if(!strcmp(argv[1], "-m"))
-         manual_mode = true;
+      {
+            manual_mode = true;
+            cout << "MANUAL MODE\n";
+      }
+      else if(!strcmp(argv[1], "-v"))
+      {
+            verbose_mode = true;
+            cout << "VERBOSE MODE\n";
+      }
+      else if(!strcmp(argv[1], "-f"))
+      {
+            file_mode = true;
+            cout << "FILE MODE\n";
+
+            outputFile.open("arduino_log.txt");
+            outputFile << "Arduino output: \n\n";
+            outputFile.close();
+      }
    }
    try
    {
@@ -98,7 +120,8 @@ int main(int argc, char* argv[])
                         decodedBitstream[j] += '\n'; //richiesto dalla seriale
 
                         // Printa l'istruzione decodificata
-                        //cout << "Decoded instruction[" << j << "/" << decodedBitstream.size() << "]: " << decodedBitstream[j];
+                        if(verbose_mode)
+                              cout << "Decoded instruction[" << j << "/" << (decodedBitstream.size() - 1) << "]: " << decodedBitstream[j];
 
                         serialPort.WriteString(decodedBitstream[j].c_str());
 
@@ -118,10 +141,19 @@ int main(int argc, char* argv[])
                         }
 
                         // Printa il progresso dell'upload
-                        cout << " Progresso: " << j << "/" << decodedBitstream.size()-1 << "\r" << flush;
+                        if(!verbose_mode)
+                              cout << " Progresso: " << j << "/" << decodedBitstream.size()-1 << "\r" << flush;
 
                         // Printa la risposta dell'Arduino
-                        //cout << "<arduino> " << endl << s_tmp << "</arduino>\n";
+                        if(verbose_mode)
+                              cout << "Risposta arduino istruzione "<< j << "/" << (decodedBitstream.size() - 1) << ":\n<\n" << s_tmp << ">\n";
+                        
+                        if(file_mode)
+                        {
+                              outputFile.open("arduino_log.txt", ios::app);
+                              outputFile << "Risposta arduino riga "<< j << "/" << (decodedBitstream.size() - 1) << "\n" << s_tmp;
+                              outputFile.close();
+                        }
                   }
 
                   cout << "\nUpload bitstream completato.";
@@ -163,6 +195,9 @@ int main(int argc, char* argv[])
 
          }
          cout << "Update completato" << endl;
+
+         if(file_mode)
+            cout << "File di log creato nella cartella. Controlla arduino_log.txt!\n";
       }
    }
    catch(TimeoutException& e)
