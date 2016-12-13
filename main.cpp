@@ -36,6 +36,7 @@ int main(int argc, char* argv[])
    bool verbose_mode = false;
    bool file_mode = false;
    bool help_mode = false;
+   bool wrong_argument = false;
 
    ofstream outputFile;
    string fileName = "arduino_log.txt";
@@ -71,6 +72,10 @@ int main(int argc, char* argv[])
       {
             help_mode = true;
       }
+      else
+      {
+            wrong_argument = true;
+      }
    }
    try
    {
@@ -78,7 +83,11 @@ int main(int argc, char* argv[])
       cout << "Porta seriale aperta con successo!\n";
       serialPort.FlushReceiver();
 
-      if(manual_mode)
+      if(wrong_argument)
+      {
+         cout << "\nArgomento non riconosciuto. Digita -h per aiuto.\n\n";
+      }
+      else if(manual_mode)
       {
          cout << "Modalità manuale.\n";
          cout << "Inserire comando da inviare (digitare 'quit' per uscire):";
@@ -106,7 +115,7 @@ int main(int argc, char* argv[])
       {
             cout << "\n******************************************************************************************************************************************************************\n";
             cout << "HELP  Modalità disponibili:\n";
-            cout << "NoArg        - Modalità normale: prevede il minimo output su terminale possibile. Modalità standard.\n";
+            cout << "             - Modalità normale: prevede il minimo output su terminale possibile. Modalità di esecuzione standard.\n";
             cout << "-v           - Modalità verbosa: prevede un output su terminale più verboso durante l'upload del bitstream.\n";
             cout << "-f [fileName]- Modalità su file: prevede che l'output della modalità verbosa venga scritto su file. è possibile specificare il nome del file come terzo argomento.\n";
             cout << "-h           - Modalità di aiuto: stampa su terminale questo aiuto.\n";
